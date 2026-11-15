@@ -1,0 +1,417 @@
+{
+ "service": "https://simbad.cds.unistra.fr/simbad/sim-tap/sync",
+ "mirror": "https://simbad.harvard.edu/simbad/sim-tap/sync",
+ "ref_year": 2026.0,
+ "units": "proper motion mas/yr (pmra = mu_alpha*cos(dec)), parallax mas, position differences arcsec, all as SIMBAD minus ours",
+ "targets": {
+  "wise0855": {
+   "name": "WISE 0855−0714",
+   "fetched": "2026-11-14",
+   "ours": {
+    "ra": 133.795125,
+    "dec": -7.245139,
+    "epoch": 2010.5,
+    "pmra_mas": -8118.0,
+    "pmdec_mas": 680.0,
+    "plx_mas": 439.0
+   },
+   "found": true,
+   "not_found": [],
+   "objects": {
+    "WISE J085510.83-071442.5": {
+     "main_id": "WISEA J085510.74-071442.5",
+     "matched_id": [
+      "WISE J085510.83-071442.5"
+     ],
+     "sp_type": "Y2",
+     "simbad": {
+      "ra": 133.8189082,
+      "dec": -7.247048,
+      "pmra_mas": -8123.7,
+      "pmdec_mas": 673.2,
+      "plx_mas": 439,
+      "plx_err_mas": 2.4
+     },
+     "bibcode": {
+      "coo": "2021ApJS..253....7K",
+      "pm": "2021ApJS..253....7K",
+      "plx": "2021ApJS..253....7K"
+     },
+     "diff": {
+      "pmra_mas": -5.7,
+      "pmdec_mas": -6.8,
+      "pm_mas": 8.873,
+      "plx_mas": 0.0
+     },
+     "ours_at_j2000": {
+      "ra": 133.8189932,
+      "dec": -7.2471217
+     },
+     "pos_j2000_arcsec": {
+      "dra": -0.3033,
+      "ddec": 0.2654,
+      "sep": 0.403
+     },
+     "pos_as_entered_arcsec": {
+      "dra": 84.9357,
+      "ddec": -6.8746,
+      "sep": 85.2135
+     },
+     "pm_drift_ref_arcsec": 0.1375,
+     "pos_ref_arcsec": {
+      "dra": -0.4505,
+      "ddec": 0.0997,
+      "sep": 0.4614
+     }
+    }
+   }
+  },
+  "barnard": {
+   "name": "Barnard's Star",
+   "fetched": "2026-11-14",
+   "ours": {
+    "ra": 269.448503,
+    "dec": 4.73942,
+    "epoch": 2016.0,
+    "pmra_mas": -801.55,
+    "pmdec_mas": 10362.39,
+    "plx_mas": 546.98
+   },
+   "found": true,
+   "not_found": [],
+   "objects": {
+    "Barnard's Star": {
+     "main_id": "NAME Barnard's star",
+     "matched_id": [
+      "GJ 699",
+      "NAME Barnard's star"
+     ],
+     "sp_type": "M4V",
+     "simbad": {
+      "ra": 269.452077,
+      "dec": 4.693365,
+      "pmra_mas": -801.551,
+      "pmdec_mas": 10362.394,
+      "plx_mas": 546.9759,
+      "plx_err_mas": 0.0401
+     },
+     "bibcode": {
+      "coo": "2020yCat.1350....0G",
+      "pm": "2020yCat.1350....0G",
+      "plx": "2020yCat.1350....0G"
+     },
+     "diff": {
+      "pmra_mas": -0.001,
+      "pmdec_mas": 0.004,
+      "pm_mas": 0.0041,
+      "plx_mas": -0.0041
+     },
+     "ours_at_j2000": {
+      "ra": 269.4520774,
+      "dec": 4.6933649
+     },
+     "pos_j2000_arcsec": {
+      "dra": -0.0017,
+      "ddec": 0.0001,
+      "sep": 0.0017
+     },
+     "pos_as_entered_arcsec": {
+      "dra": 12.8231,
+      "ddec": -165.7981,
+      "sep": 166.2933
+     },
+     "pm_drift_ref_arcsec": 0.0,
+     "pos_ref_arcsec": {
+      "dra": -0.0031,
+      "ddec": 0.0,
+      "sep": 0.0031
+     }
+    }
+   }
+  },
+  "epsindib": {
+   "name": "ε Indi Ba/Bb",
+   "fetched": "2026-11-14",
+   "ours": {
+    "ra": 331.04383,
+    "dec": -56.78269,
+    "epoch": 2000.0,
+    "pmra_mas": 3966.0,
+    "pmdec_mas": -2536.0,
+    "plx_mas": 274.8
+   },
+   "found": true,
+   "not_found": [
+    "eps Ind Ba",
+    "eps Ind Bb"
+   ],
+   "objects": {
+    "eps Ind B": {
+     "main_id": "* eps Ind B",
+     "matched_id": [
+      "* eps Ind B"
+     ],
+     "sp_type": "T1V+T6V",
+     "simbad": {
+      "ra": 331.0441466,
+      "dec": -56.7828442,
+      "pmra_mas": 3981.977,
+      "pmdec_mas": -2466.832,
+      "plx_mas": 270.658,
+      "plx_err_mas": 0.6896
+     },
+     "bibcode": {
+      "coo": "2020yCat.1350....0G",
+      "pm": "2020yCat.1350....0G",
+      "plx": "2020yCat.1350....0G"
+     },
+     "diff": {
+      "pmra_mas": 15.977,
+      "pmdec_mas": 69.168,
+      "pm_mas": 70.9893,
+      "plx_mas": -4.142
+     },
+     "ours_at_j2000": {
+      "ra": 331.04383,
+      "dec": -56.78269
+     },
+     "pos_j2000_arcsec": {
+      "dra": 0.6244,
+      "ddec": -0.5551,
+      "sep": 0.8354
+     },
+     "pos_as_entered_arcsec": {
+      "dra": 0.6244,
+      "ddec": -0.5551,
+      "sep": 0.8354
+     },
+     "pm_drift_ref_arcsec": 1.8457,
+     "pos_ref_arcsec": {
+      "dra": 1.0385,
+      "ddec": 1.2436,
+      "sep": 1.6202
+     }
+    },
+    "eps Ind A": {
+     "main_id": "* eps Ind",
+     "matched_id": [
+      "* eps Ind",
+      "HD 209100"
+     ],
+     "sp_type": "K5V",
+     "simbad": {
+      "ra": 330.8402234,
+      "dec": -56.7859786,
+      "pmra_mas": 3966.661,
+      "pmdec_mas": -2536.192,
+      "plx_mas": 274.8431,
+      "plx_err_mas": 0.0956
+     },
+     "bibcode": {
+      "coo": "2020yCat.1350....0G",
+      "pm": "2020yCat.1350....0G",
+      "plx": "2020yCat.1350....0G"
+     },
+     "diff": {
+      "pmra_mas": 0.661,
+      "pmdec_mas": -0.192,
+      "pm_mas": 0.6883,
+      "plx_mas": 0.0431
+     },
+     "ours_at_j2000": {
+      "ra": 331.04383,
+      "dec": -56.78269
+     },
+     "pos_j2000_arcsec": {
+      "dra": -401.5049,
+      "ddec": -12.4356,
+      "sep": 401.6974
+     },
+     "pos_as_entered_arcsec": {
+      "dra": -401.5049,
+      "ddec": -12.4356,
+      "sep": 401.6974
+     },
+     "pm_drift_ref_arcsec": 0.0179,
+     "pos_ref_arcsec": {
+      "dra": -401.2827,
+      "ddec": -12.4404,
+      "sep": 401.4755
+     }
+    }
+   }
+  },
+  "luhman16": {
+   "name": "Luhman 16 AB",
+   "fetched": "2026-11-14",
+   "ours": {
+    "ra": 162.314875,
+    "dec": -53.318361,
+    "epoch": 2010.4,
+    "pmra_mas": -2759.0,
+    "pmdec_mas": 358.0,
+    "plx_mas": 496.0
+   },
+   "found": true,
+   "not_found": [],
+   "objects": {
+    "Luhman 16": {
+     "main_id": "NAME Luhman 16",
+     "matched_id": [
+      "NAME Luhman 16",
+      "WISE J104915.57-531906.1"
+     ],
+     "sp_type": "L7.5+T0.5",
+     "simbad": {
+      "ra": 162.328814,
+      "dec": -53.319466,
+      "pmra_mas": -2767.502,
+      "pmdec_mas": 356.856,
+      "plx_mas": 501.557,
+      "plx_err_mas": 0.082
+     },
+     "bibcode": {
+      "coo": "2003yCat.2246....0C",
+      "pm": "2018A&A...618A.111L",
+      "plx": "2018A&A...618A.111L"
+     },
+     "diff": {
+      "pmra_mas": -8.502,
+      "pmdec_mas": -1.144,
+      "pm_mas": 8.5786,
+      "plx_mas": 5.557
+     },
+     "ours_at_j2000": {
+      "ra": 162.3282179,
+      "dec": -53.3193945
+     },
+     "pos_j2000_arcsec": {
+      "dra": 1.2818,
+      "ddec": -0.2575,
+      "sep": 1.3075
+     },
+     "pos_as_entered_arcsec": {
+      "dra": 29.9754,
+      "ddec": -3.9809,
+      "sep": 30.2386
+     },
+     "pm_drift_ref_arcsec": 0.1338,
+     "pos_ref_arcsec": {
+      "dra": 1.0625,
+      "ddec": -0.2737,
+      "sep": 1.0972
+     }
+    },
+    "Luhman 16A": {
+     "main_id": "NAME Luhman 16A",
+     "matched_id": [
+      "NAME Luhman 16A"
+     ],
+     "sp_type": "L7.5",
+     "simbad": {
+      "ra": 162.3084327,
+      "dec": -53.318057,
+      "pmra_mas": null,
+      "pmdec_mas": null,
+      "plx_mas": null,
+      "plx_err_mas": null
+     },
+     "bibcode": {
+      "coo": "2018yCat.1345....0G",
+      "pm": null,
+      "plx": null
+     },
+     "diff": {
+      "pmra_mas": null,
+      "pmdec_mas": null,
+      "pm_mas": null,
+      "plx_mas": null
+     },
+     "ours_at_j2000": {
+      "ra": 162.3282179,
+      "dec": -53.3193945
+     },
+     "pos_j2000_arcsec": {
+      "dra": -42.5489,
+      "ddec": 4.8091,
+      "sep": 42.8198
+     },
+     "pos_as_entered_arcsec": {
+      "dra": -13.8544,
+      "ddec": 1.0938,
+      "sep": 13.8975
+     },
+     "pm_drift_ref_arcsec": null,
+     "pos_ref_arcsec": null
+    },
+    "Luhman 16B": {
+     "main_id": "NAME Luhman 16B",
+     "matched_id": [
+      "NAME Luhman 16B"
+     ],
+     "sp_type": "T0.5",
+     "simbad": {
+      "ra": 162.3086437,
+      "dec": -53.3182778,
+      "pmra_mas": null,
+      "pmdec_mas": null,
+      "plx_mas": null,
+      "plx_err_mas": null
+     },
+     "bibcode": {
+      "coo": "2018yCat.1345....0G",
+      "pm": null,
+      "plx": null
+     },
+     "diff": {
+      "pmra_mas": null,
+      "pmdec_mas": null,
+      "pm_mas": null,
+      "plx_mas": null
+     },
+     "ours_at_j2000": {
+      "ra": 162.3282179,
+      "dec": -53.3193945
+     },
+     "pos_j2000_arcsec": {
+      "dra": -42.095,
+      "ddec": 4.0142,
+      "sep": 42.286
+     },
+     "pos_as_entered_arcsec": {
+      "dra": -13.4007,
+      "ddec": 0.2989,
+      "sep": 13.404
+     },
+     "pm_drift_ref_arcsec": null,
+     "pos_ref_arcsec": null
+    }
+   }
+  },
+  "smdet1": {
+   "name": "SMDET-1",
+   "fetched": "2026-11-14",
+   "ours": {
+    "ra": 295.791939,
+    "dec": 28.132809,
+    "epoch": 2012.115,
+    "pmra_mas": 1059.5,
+    "pmdec_mas": 714.3,
+    "plx_mas": 0.0
+   },
+   "found": false,
+   "not_found": [
+    "SMDET-1"
+   ],
+   "objects": {},
+   "cone_arcsec": 30.0,
+   "cone": []
+  }
+ },
+ "network": {
+  "bytes": 0,
+  "mb": 0.0,
+  "requests": 0,
+  "retries": 0
+ }
+}

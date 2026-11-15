@@ -1,0 +1,655 @@
+{
+ "wise0855": {
+  "name": "WISE 0855−0714",
+  "kind": "Y dwarf, 2.28 pc",
+  "center": [
+   133.7776,
+   -7.2437
+  ],
+  "n_exp": 258,
+  "n_visits": 3,
+  "extras": [
+   "analysis",
+   "candidate"
+  ],
+  "fov": 5.02
+ },
+ "smdet1": {
+  "name": "SMDET-1",
+  "kind": "Y dwarf candidate, b = +2.25° (Meisner et al. 2026)",
+  "center": [
+   295.7967,
+   28.1356
+  ],
+  "n_exp": 365,
+  "n_visits": 4,
+  "extras": [
+   "candidate"
+  ],
+  "fov": 5.02
+ },
+ "barnard": {
+  "name": "Barnard's Star",
+  "kind": "M4 dwarf, 1.83 pc",
+  "center": [
+   269.4462,
+   4.7687
+  ],
+  "n_exp": 358,
+  "n_visits": 3,
+  "extras": [],
+  "fov": 5.02
+ },
+ "epsindib": {
+  "name": "ε Indi Ba/Bb",
+  "kind": "T1 + T6 brown dwarf pair, 3.64 pc",
+  "center": [
+   331.0961,
+   -56.801
+  ],
+  "n_exp": 458,
+  "n_visits": 4,
+  "extras": [
+   "analysis"
+  ],
+  "fov": 5.02
+ },
+ "rwaur": {
+  "name": "RW Aurigae",
+  "kind": "T Tauri variable",
+  "center": [
+   76.9563,
+   30.4014
+  ],
+  "n_exp": 335,
+  "n_visits": 3,
+  "extras": [
+   "variable"
+  ],
+  "fov": 5.02
+ },
+ "rdra": {
+  "name": "R Draconis",
+  "kind": "Mira variable, P ≈ 245.6 d",
+  "center": [
+   248.1675,
+   66.755
+  ],
+  "n_exp": 2488,
+  "n_visits": 18,
+  "extras": [
+   "variable"
+  ],
+  "fov": 2.56
+ },
+ "luhman16": {
+  "name": "Luhman 16 AB",
+  "kind": "L7.5 + T0.5 brown dwarf pair, 2.0 pc",
+  "center": [
+   162.3288,
+   -53.3194
+  ],
+  "n_exp": 450,
+  "n_visits": 3,
+  "fov": 5.02,
+  "extras": []
+ },
+ "wise0855_h40": {
+  "name": "WISE 0855−0714",
+  "kind": "Y dwarf, 2.28 pc",
+  "center": [
+   133.7776,
+   -7.2437
+  ],
+  "n_exp": 258,
+  "n_visits": 3,
+  "fov": 8.3,
+  "extras": []
+ },
+ "y_wise_j071322_55_291751_9": {
+  "name": "WISE J071322.55-291751.9",
+  "kind": "Y0, 464 K, 9.1 pc",
+  "center": [
+   108.345769,
+   -29.299557
+  ],
+  "n_exp": 331,
+  "n_visits": 3,
+  "fov": 3.38,
+  "group": "ydwarf",
+  "extras": []
+ },
+ "y_wise_j043052_92_463331_6": {
+  "name": "WISE J043052.92+463331.6",
+  "kind": "T8, 516 K, 10.4 pc",
+  "center": [
+   67.72616,
+   46.560385
+  ],
+  "n_exp": 342,
+  "n_visits": 3,
+  "fov": 3.38,
+  "group": "ydwarf",
+  "extras": []
+ },
+ "y_cwise_j112106_36_623221_5": {
+  "name": "CWISE J112106.36-623221.5",
+  "kind": "Y, 460 K",
+  "center": [
+   170.273172,
+   -62.540601
+  ],
+  "n_exp": 544,
+  "n_visits": 3,
+  "fov": 3.38,
+  "group": "ydwarf",
+  "extras": []
+ },
+ "y_cwise_j092503_20_472013_8": {
+  "name": "CWISE J092503.20-472013.8",
+  "kind": "Y, 460 K",
+  "center": [
+   141.263041,
+   -47.33492
+  ],
+  "n_exp": 485,
+  "n_visits": 3,
+  "fov": 3.38,
+  "group": "ydwarf",
+  "extras": []
+ },
+ "y_cwise_j035856_18_480244_9": {
+  "name": "CWISE J035856.18+480244.9",
+  "kind": "Y, 511 K",
+  "center": [
+   59.734916,
+   48.045702
+  ],
+  "n_exp": 366,
+  "n_visits": 3,
+  "fov": 3.38,
+  "group": "ydwarf",
+  "extras": []
+ },
+ "y_wisenf_j193656_08_040801_2": {
+  "name": "WISENF J193656.08+040801.2",
+  "kind": "Y, 460 K, 8.8 pc",
+  "center": [
+   294.231565,
+   4.129103
+  ],
+  "n_exp": 482,
+  "n_visits": 4,
+  "fov": 3.38,
+  "group": "ydwarf",
+  "extras": []
+ },
+ "y_wise_j033515_01_431045_1": {
+  "name": "WISE J033515.01+431045.1",
+  "kind": "T9, 495 K, 11.8 pc",
+  "center": [
+   53.817604,
+   43.175728
+  ],
+  "n_exp": 374,
+  "n_visits": 3,
+  "fov": 3.38,
+  "group": "ydwarf",
+  "extras": []
+ },
+ "y_cwisep_j032109_59_693204_5": {
+  "name": "CWISEP J032109.59+693204.5",
+  "kind": "Y, 412 K, 14.6 pc",
+  "center": [
+   50.298816,
+   69.533557
+  ],
+  "n_exp": 348,
+  "n_visits": 3,
+  "fov": 3.38,
+  "group": "ydwarf",
+  "extras": []
+ },
+ "y_wise_j031624_35_430709_1": {
+  "name": "WISE J031624.35+430709.1",
+  "kind": "T8, 520 K, 13.4 pc",
+  "center": [
+   49.103947,
+   43.11803
+  ],
+  "n_exp": 399,
+  "n_visits": 3,
+  "fov": 3.38,
+  "group": "ydwarf",
+  "extras": []
+ },
+ "y_wise_j163940_86_684744_6": {
+  "name": "WISE J163940.86-684744.6",
+  "kind": "Y0 pec, 412 K, 4.6 pc",
+  "center": [
+   249.927071,
+   -68.80763
+  ],
+  "n_exp": 397,
+  "n_visits": 3,
+  "fov": 3.38,
+  "group": "ydwarf",
+  "extras": []
+ },
+ "y_cwise_j181125_34_665806_4": {
+  "name": "CWISE J181125.34+665806.4",
+  "kind": "Y, 412 K, 14.3 pc",
+  "center": [
+   272.854953,
+   66.967008
+  ],
+  "n_exp": 598,
+  "n_visits": 17,
+  "fov": 3.38,
+  "group": "ydwarf",
+  "extras": []
+ },
+ "y_cwisep_j023842_60_133210_7": {
+  "name": "CWISEP J023842.60-133210.7",
+  "kind": "Y, 367 K, 11.7 pc",
+  "center": [
+   39.677291,
+   -13.53895
+  ],
+  "n_exp": 181,
+  "n_visits": 3,
+  "fov": 3.38,
+  "group": "ydwarf",
+  "extras": []
+ },
+ "y_cwisep_j040235_55_265145_4": {
+  "name": "CWISEP J040235.55-265145.4",
+  "kind": "Y, 367 K, 8.6 pc",
+  "center": [
+   60.651197,
+   -26.864594
+  ],
+  "n_exp": 173,
+  "n_visits": 3,
+  "fov": 3.38,
+  "group": "ydwarf",
+  "extras": []
+ },
+ "y_cwisep_j094005_50_523359_2": {
+  "name": "CWISEP J094005.50+523359.2",
+  "kind": "Y, 367 K, 15.1 pc",
+  "center": [
+   145.021169,
+   52.565349
+  ],
+  "n_exp": 119,
+  "n_visits": 2,
+  "fov": 3.38,
+  "group": "ydwarf",
+  "extras": []
+ },
+ "y_cwisep_j144606_62_231717_8": {
+  "name": "CWISEP J144606.62-231717.8",
+  "kind": "Y, 367 K, 10.5 pc",
+  "center": [
+   221.524704,
+   -23.291131
+  ],
+  "n_exp": 180,
+  "n_visits": 3,
+  "fov": 3.38,
+  "group": "ydwarf",
+  "extras": []
+ },
+ "y_cwisep_j193518_59_154620_3": {
+  "name": "CWISEP J193518.59-154620.3",
+  "kind": "Y, 367 K, 14.4 pc",
+  "center": [
+   293.828395,
+   -15.772261
+  ],
+  "n_exp": 164,
+  "n_visits": 3,
+  "fov": 3.38,
+  "group": "ydwarf",
+  "extras": []
+ },
+ "y_cwisep_j223022_60_254907_5": {
+  "name": "CWISEP J223022.60+254907.5",
+  "kind": "Y, 367 K, 14.0 pc",
+  "center": [
+   337.592068,
+   25.817186
+  ],
+  "n_exp": 191,
+  "n_visits": 3,
+  "fov": 3.38,
+  "group": "ydwarf",
+  "extras": []
+ },
+ "y_cwisep_j225628_97_400227_3": {
+  "name": "CWISEP J225628.97+400227.3",
+  "kind": "Y, 367 K, 9.8 pc",
+  "center": [
+   344.123899,
+   40.04046
+  ],
+  "n_exp": 206,
+  "n_visits": 3,
+  "fov": 3.38,
+  "group": "ydwarf",
+  "extras": []
+ },
+ "y_cwisep_j235644_78_481456_3": {
+  "name": "CWISEP J235644.78-481456.3",
+  "kind": "Y, 412 K",
+  "center": [
+   359.190816,
+   -48.249299
+  ],
+  "n_exp": 192,
+  "n_visits": 3,
+  "fov": 3.38,
+  "group": "ydwarf",
+  "extras": []
+ },
+ "y_wise_j014656_66_423410_0_ab": {
+  "name": "WISE J014656.66+423410.0 AB",
+  "kind": "Y0, 19.3 pc",
+  "center": [
+   26.733535,
+   42.569301
+  ],
+  "n_exp": 225,
+  "n_visits": 3,
+  "fov": 3.38,
+  "group": "ydwarf",
+  "extras": []
+ },
+ "y_wise_j030449_03_270508_3": {
+  "name": "WISE J030449.03-270508.3",
+  "kind": "Y0 pec, 465 K, 13.7 pc",
+  "center": [
+   46.204974,
+   -27.083473
+  ],
+  "n_exp": 190,
+  "n_visits": 3,
+  "fov": 3.38,
+  "group": "ydwarf",
+  "extras": []
+ },
+ "y_wise_j033605_05_014350_4_ab": {
+  "name": "WISE J033605.05-014350.4 AB",
+  "kind": "Y0, 10.0 pc",
+  "center": [
+   54.020019,
+   -1.736215
+  ],
+  "n_exp": 176,
+  "n_visits": 3,
+  "fov": 3.38,
+  "group": "ydwarf",
+  "extras": []
+ },
+ "y_wise_j035000_32_565830_2": {
+  "name": "WISE J035000.32-565830.2",
+  "kind": "Y1, 388 K, 5.7 pc",
+  "center": [
+   57.49972,
+   -56.977556
+  ],
+  "n_exp": 241,
+  "n_visits": 3,
+  "fov": 3.38,
+  "group": "ydwarf",
+  "extras": []
+ },
+ "y_wise_j035934_06_540154_6": {
+  "name": "WISE J035934.06-540154.6",
+  "kind": "Y0, 436 K, 13.6 pc",
+  "center": [
+   59.89106,
+   -54.035044
+  ],
+  "n_exp": 183,
+  "n_visits": 3,
+  "fov": 3.38,
+  "group": "ydwarf",
+  "extras": []
+ },
+ "y_wise_j053516_80_750024_9": {
+  "name": "WISE J053516.80-750024.9",
+  "kind": ">=Y1:, 410 K, 14.6 pc",
+  "center": [
+   83.817926,
+   -75.00666
+  ],
+  "n_exp": 423,
+  "n_visits": 12,
+  "fov": 3.38,
+  "group": "ydwarf",
+  "extras": []
+ },
+ "y_wise_j064723_23_623235_5": {
+  "name": "WISE J064723.23-623235.5",
+  "kind": "Y1, 393 K, 10.1 pc",
+  "center": [
+   101.846811,
+   -62.541517
+  ],
+  "n_exp": 365,
+  "n_visits": 17,
+  "fov": 3.38,
+  "group": "ydwarf",
+  "extras": []
+ },
+ "y_wise_j073444_02_715744_0": {
+  "name": "WISE J073444.02-715744.0",
+  "kind": "Y0, 462 K, 13.4 pc",
+  "center": [
+   113.675435,
+   -71.962552
+  ],
+  "n_exp": 384,
+  "n_visits": 11,
+  "fov": 3.38,
+  "group": "ydwarf",
+  "extras": []
+ },
+ "y_wise_j082507_35_280548_5": {
+  "name": "WISE J082507.35+280548.5",
+  "kind": "Y0.5, 376 K, 6.6 pc",
+  "center": [
+   126.280305,
+   28.095759
+  ],
+  "n_exp": 110,
+  "n_visits": 2,
+  "fov": 3.38,
+  "group": "ydwarf",
+  "extras": []
+ },
+ "y_wise_j120604_38_840110_6": {
+  "name": "WISE J120604.38+840110.6",
+  "kind": "Y0, 454 K, 11.8 pc",
+  "center": [
+   181.494071,
+   84.018406
+  ],
+  "n_exp": 221,
+  "n_visits": 3,
+  "fov": 3.38,
+  "group": "ydwarf",
+  "extras": []
+ },
+ "y_wise_j220905_73_271143_9": {
+  "name": "WISE J220905.73+271143.9",
+  "kind": "Y0:, 389 K, 6.2 pc",
+  "center": [
+   332.279781,
+   27.189624
+  ],
+  "n_exp": 196,
+  "n_visits": 3,
+  "fov": 3.38,
+  "group": "ydwarf",
+  "extras": []
+ },
+ "y_wise_j222055_31_362817_4": {
+  "name": "WISE J222055.31-362817.4",
+  "kind": "Y0, 452 K, 10.5 pc",
+  "center": [
+   335.232078,
+   -36.471958
+  ],
+  "n_exp": 172,
+  "n_visits": 3,
+  "fov": 3.38,
+  "group": "ydwarf",
+  "extras": []
+ },
+ "y_wisea_j030237_53_581740_3": {
+  "name": "WISEA J030237.53-581740.3",
+  "kind": "Y0:, 460 K, 16.7 pc",
+  "center": [
+   45.656441,
+   -58.294905
+  ],
+  "n_exp": 200,
+  "n_visits": 3,
+  "fov": 3.38,
+  "group": "ydwarf",
+  "extras": []
+ },
+ "y_wisea_j083011_95_283716_0": {
+  "name": "WISEA J083011.95+283716.0",
+  "kind": "Y, 367 K, 11.0 pc",
+  "center": [
+   127.548915,
+   28.612417
+  ],
+  "n_exp": 87,
+  "n_visits": 2,
+  "fov": 3.38,
+  "group": "ydwarf",
+  "extras": []
+ },
+ "y_wisea_j114156_67_332635_5": {
+  "name": "WISEA J114156.67-332635.5",
+  "kind": "Y0, 460 K, 9.6 pc",
+  "center": [
+   175.481592,
+   -33.443489
+  ],
+  "n_exp": 174,
+  "n_visits": 3,
+  "fov": 3.38,
+  "group": "ydwarf",
+  "extras": []
+ },
+ "y_wisea_j125721_01_715349_3": {
+  "name": "WISEA J125721.01+715349.3",
+  "kind": "Y, 367 K",
+  "center": [
+   194.325083,
+   71.897162
+  ],
+  "n_exp": 176,
+  "n_visits": 2,
+  "fov": 3.38,
+  "group": "ydwarf",
+  "extras": []
+ },
+ "y_wisea_j193054_55_205949_4": {
+  "name": "WISEA J193054.55-205949.4",
+  "kind": "Y, 367 K, 9.4 pc",
+  "center": [
+   292.722529,
+   -21.001685
+  ],
+  "n_exp": 205,
+  "n_visits": 3,
+  "fov": 3.38,
+  "group": "ydwarf",
+  "extras": []
+ },
+ "y_wisea_j235402_79_024014_1": {
+  "name": "WISEA J235402.79+024014.1",
+  "kind": "Y1, 388 K, 7.7 pc",
+  "center": [
+   358.513718,
+   2.668931
+  ],
+  "n_exp": 166,
+  "n_visits": 3,
+  "fov": 3.38,
+  "group": "ydwarf",
+  "extras": []
+ },
+ "y_wisepa_j041022_71_150248_5": {
+  "name": "WISEPA J041022.71+150248.5",
+  "kind": "Y0, 451 K, 6.6 pc",
+  "center": [
+   62.599164,
+   15.037025
+  ],
+  "n_exp": 162,
+  "n_visits": 3,
+  "fov": 3.38,
+  "group": "ydwarf",
+  "extras": []
+ },
+ "y_wisepa_j154151_66_225025_2": {
+  "name": "WISEPA J154151.66-225025.2",
+  "kind": "Y1, 395 K, 6.0 pc",
+  "center": [
+   235.460797,
+   -22.840856
+  ],
+  "n_exp": 172,
+  "n_visits": 3,
+  "fov": 3.38,
+  "group": "ydwarf",
+  "extras": []
+ },
+ "y_wisepa_j173835_53_273258_9": {
+  "name": "WISEPA J173835.53+273258.9",
+  "kind": "Y0, 450 K, 7.6 pc",
+  "center": [
+   264.649709,
+   27.548173
+  ],
+  "n_exp": 186,
+  "n_visits": 3,
+  "fov": 3.38,
+  "group": "ydwarf",
+  "extras": []
+ },
+ "y_wisepa_j182831_08_265037_8": {
+  "name": "WISEPA J182831.08+265037.8",
+  "kind": ">=Y2, 406 K, 10.0 pc",
+  "center": [
+   277.134514,
+   26.844577
+  ],
+  "n_exp": 202,
+  "n_visits": 3,
+  "fov": 3.38,
+  "group": "ydwarf",
+  "extras": []
+ },
+ "y_wisepc_j140518_40_553421_4": {
+  "name": "WISEPC J140518.40+553421.4",
+  "kind": "Y0.5 (pec?), 411 K, 6.3 pc",
+  "center": [
+   211.308712,
+   55.57355
+  ],
+  "n_exp": 73,
+  "n_visits": 1,
+  "fov": 3.38,
+  "group": "ydwarf",
+  "extras": []
+ }
+}
