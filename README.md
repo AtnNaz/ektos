@@ -155,9 +155,9 @@ steps with figures you can move.
 ### 1. Reading the archive
 
 An IRSA SIA2 query lists every image that covers a position. The `IMAGE` extension of each file is
-uncompressed float32, so pixels can be addressed by byte offset. For a window of half-width $h$
-pixels ($n = 2h + 1$ rows of $4n$ bytes), with header size $H$ and request overhead $o$, the cost of
-$N$ exposures is
+uncompressed float32, so pixels can be addressed by byte offset. For a window of half-width $`h`$
+pixels ($`n = 2h + 1`$ rows of $`4n`$ bytes), with header size $`H`$ and request overhead $`o`$, the cost of
+$`N`$ exposures is
 
 ```math
 B \approx N\,[\,H + o + n\,(4n + o)\,], \qquad n = 2h + 1 .
@@ -168,8 +168,8 @@ For 358 exposures of a 5′ field this is about 29 MB. The cutout service needs
 
 ### 2. From sky to plate
 
-A point $(\alpha, \delta)$ is projected on the tangent plane at the field center
-$(\alpha_0, \delta_0)$, with $\Delta\alpha = \alpha - \alpha_0$:
+A point $`(\alpha, \delta)`$ is projected on the tangent plane at the field center
+$`(\alpha_0, \delta_0)`$, with $`\Delta\alpha = \alpha - \alpha_0`$:
 
 ```math
 \xi = \frac{\cos\delta\,\sin\Delta\alpha}{\cos c}, \qquad
@@ -179,22 +179,22 @@ $(\alpha_0, \delta_0)$, with $\Delta\alpha = \alpha - \alpha_0$:
 
 ### 3. Sky level and noise of one exposure
 
-The sky level is the median $m$ of the pixel values $v$. The noise comes from the median absolute
+The sky level is the median $`m`$ of the pixel values $`v`$. The noise comes from the median absolute
 deviation, which stars do not pull:
 
 ```math
-m = \operatorname{med}(v), \qquad \sigma = 1.4826 \cdot \operatorname{med}\,|v - m| .
+m = \mathrm{med}(v), \qquad \sigma = 1.4826 \cdot \mathrm{med}\,|v - m| .
 ```
 
-The factor is $1/\Phi^{-1}(3/4) = 1/0.6745$: for a Gaussian the median absolute deviation is
-$0.6745\,\sigma$. Pixels with $|v - m| > 3\sigma$ are left out and the two numbers are computed
+The factor is $`1/\Phi^{-1}(3/4) = 1/0.6745`$: for a Gaussian the median absolute deviation is
+$`0.6745\,\sigma`$. Pixels with $`|v - m| > 3\sigma`$ are left out and the two numbers are computed
 again.
 
 ### 4. One common grid
 
 Each exposure has its own affine map between pixels and the plate,
-$(\xi, \eta)^{T} = M\,(x, y)^{T} + c$. For every grid point we invert it and take the bilinear
-value of the four pixels around $(x, y)$, with fractions $f_x, f_y$:
+$`(\xi, \eta)^{T} = M\,(x, y)^{T} + c`$. For every grid point we invert it and take the bilinear
+value of the four pixels around $`(x, y)`$, with fractions $`f_x, f_y`$:
 
 ```math
 v = (1-f_x)(1-f_y)\,v_{00} + f_x(1-f_y)\,v_{10} + (1-f_x)f_y\,v_{01} + f_x f_y\,v_{11} .
@@ -202,25 +202,25 @@ v = (1-f_x)(1-f_y)\,v_{00} + f_x(1-f_y)\,v_{10} + (1-f_x)f_y\,v_{01} + f_x f_y\,
 
 ### 5. Stacking
 
-The exposures inside the wavelength window are averaged with weights $w_i = 1/\sigma_i^2$:
+The exposures inside the wavelength window are averaged with weights $`w_i = 1/\sigma_i^2`$:
 
 ```math
 \bar{x} = \frac{\sum_i w_i x_i}{\sum_i w_i}, \qquad \sigma_{\bar{x}} = \Big(\sum_i w_i\Big)^{-1/2} .
 ```
 
-Why these weights: for any weights $a_i$ with $\sum_i a_i = 1$ the variance of the mean is
-$\sum_i a_i^2 \sigma_i^2$. Setting the derivative of
-$\sum_i a_i^2\sigma_i^2 - \lambda(\sum_i a_i - 1)$ to zero gives $2a_i\sigma_i^2 = \lambda$, so
-$a_i \propto 1/\sigma_i^2$, and the smallest possible variance is $1/\sum_i w_i$. With equal noise
-this is the usual $\sigma/\sqrt{N}$. A pixel value is dropped from a stack of three or more when
-$|x_i - \operatorname{med}(x)| > \max(8\sigma_i,\ 2\,|\operatorname{med}(x)|)$. Gaps longer than 60
+Why these weights: for any weights $`a_i`$ with $`\sum_i a_i = 1`$ the variance of the mean is
+$`\sum_i a_i^2 \sigma_i^2`$. Setting the derivative of
+$`\sum_i a_i^2\sigma_i^2 - \lambda(\sum_i a_i - 1)`$ to zero gives $`2a_i\sigma_i^2 = \lambda`$, so
+$`a_i \propto 1/\sigma_i^2`$, and the smallest possible variance is $`1/\sum_i w_i`$. With equal noise
+this is the usual $`\sigma/\sqrt{N}`$. A pixel value is dropped from a stack of three or more when
+$`|x_i - \mathrm{med}(x)| > \max(8\sigma_i,\ 2\,|\mathrm{med}(x)|)`$. Gaps longer than 60
 days separate the visits.
 
 ### 6. Flux of a point source
 
-Around a source the pixels are modeled as the PSF $P_i$ times a flux $F$ plus a flat sky $S$,
-$d_i \simeq F\,P_i + S$, with a Gaussian PSF $P_i = \frac{1}{2\pi s^2}\exp(-r_i^2/2s^2)$.
-Minimizing $\sum_i (d_i - F P_i - S)^2$ over $F$ and $S$ gives two linear equations, and their
+Around a source the pixels are modeled as the PSF $`P_i`$ times a flux $`F`$ plus a flat sky $`S`$,
+$`d_i \simeq F\,P_i + S`$, with a Gaussian PSF $`P_i = \frac{1}{2\pi s^2}\exp(-r_i^2/2s^2)`$.
+Minimizing $`\sum_i (d_i - F P_i - S)^2`$ over $`F`$ and $`S`$ gives two linear equations, and their
 solution is
 
 ```math
@@ -228,8 +228,8 @@ F = \frac{n\sum P_i d_i - \sum P_i \sum d_i}{n\sum P_i^2 - \big(\sum P_i\big)^2}
 \sigma_F = \sigma\,\sqrt{\frac{n}{n\sum P_i^2 - \big(\sum P_i\big)^2}} .
 ```
 
-Units: $F[\mu\mathrm{Jy}] = F[\mathrm{MJy/sr}] \times \Omega / (4.2545\times10^{10}) \times 10^{12}$,
-where $\Omega$ is the pixel area in arcsec². For a candidate test the target, all nearby catalog
+Units: $`F[\mu\mathrm{Jy}] = F[\mathrm{MJy/sr}] \times \Omega / (4.2545\times10^{10}) \times 10^{12}`$,
+where $`\Omega`$ is the pixel area in arcsec². For a candidate test the target, all nearby catalog
 sources and the sky are fitted together in every exposure.
 
 ### 7. Position of a source
@@ -241,7 +241,7 @@ G_i = A \exp\!\Big(-\frac{(x_i-x_0)^2 + (y_i-y_0)^2}{2s^2}\Big) + B, \qquad
 \chi^2 = \sum_i \Big(\frac{G_i - z_i}{\sigma_i}\Big)^2 \to \min .
 ```
 
-The start point is a weighted centroid with a Gaussian window $g_i$ of the same width, iterated as
+The start point is a weighted centroid with a Gaussian window $`g_i`$ of the same width, iterated as
 
 ```math
 \Delta x = 2\,\frac{\sum_i g_i z_i (x_i - x_c)}{\sum_i g_i z_i}, \qquad x_c \leftarrow x_c + \Delta x .
@@ -249,15 +249,15 @@ The start point is a weighted centroid with a Gaussian window $g_i$ of the same 
 
 The factor 2 is there because the product of the source and a window of the same width peaks
 halfway between them. If the scatter of the pixels is larger than the error map says, the position
-error is multiplied by $\sqrt{\chi^2/\nu}$.
+error is multiplied by $`\sqrt{\chi^2/\nu}`$.
 
 ### 8. Separation by color
 
-`W2s` is the 4.0-5.03 µm stack and `W1s` the 3.0-3.8 µm stack of the same visit. With $k$ the
+`W2s` is the 4.0-5.03 µm stack and `W1s` the 3.0-3.8 µm stack of the same visit. With $`k`$ the
 median flux ratio of the field stars,
 
 ```math
-R = W2_s - k\,W1_s, \qquad k = \operatorname*{med}_j \frac{W2_{s,j}}{W1_{s,j}}, \qquad
+R = W2_s - k\,W1_s, \qquad k = \underset{j}{\mathrm{med}} \frac{W2_{s,j}}{W1_{s,j}}, \qquad
 \sigma_R = \sqrt{\sigma_{W2_s}^2 + k^2\,\sigma_{W1_s}^2} .
 ```
 
@@ -274,22 +274,22 @@ removed. The path of the object is a straight line plus the yearly parallax:
 \eta(t) = \eta_0 + \mu_\eta\,(t - t_0) + \varpi\,P_\delta(t) .
 ```
 
-The parallax factors come from the position $(X, Y, Z)$ of the Earth in au, relative to the
-barycenter. A nearby object appears shifted by $-\varpi\,\mathbf{r}_\oplus$ projected on the local
-east and north unit vectors $\mathbf{e}_\alpha = (-\sin\alpha, \cos\alpha, 0)$ and
-$\mathbf{e}_\delta = (-\sin\delta\cos\alpha, -\sin\delta\sin\alpha, \cos\delta)$, so
+The parallax factors come from the position $`(X, Y, Z)`$ of the Earth in au, relative to the
+barycenter. A nearby object appears shifted by $`-\varpi\,\mathbf{r}_\oplus`$ projected on the local
+east and north unit vectors $`\mathbf{e}_\alpha = (-\sin\alpha, \cos\alpha, 0)`$ and
+$`\mathbf{e}_\delta = (-\sin\delta\cos\alpha, -\sin\delta\sin\alpha, \cos\delta)`$, so
 
 ```math
 P_\alpha = X\sin\alpha - Y\cos\alpha, \qquad
 P_\delta = X\cos\alpha\sin\delta + Y\sin\alpha\sin\delta - Z\cos\delta .
 ```
 
-The model is linear in $p = (\xi_0, \eta_0, \mu_\xi, \mu_\eta, \varpi)$. With the design matrix $A$,
-the weights $W = \operatorname{diag}(1/\sigma_i^2)$ and the measured coordinates $y$:
+The model is linear in $`p = (\xi_0, \eta_0, \mu_\xi, \mu_\eta, \varpi)`$. With the design matrix $`A`$,
+the weights $`W = \mathrm{diag}(1/\sigma_i^2)`$ and the measured coordinates $`y`$:
 
 ```math
 \hat{p} = (A^{T} W A)^{-1} A^{T} W y, \qquad
-\sigma_p = \sqrt{\operatorname{diag}\big[(A^{T} W A)^{-1}\big]\cdot\max\big(1, \chi^2/\nu\big)}, \qquad \nu = 2n - 5 .
+\sigma_p = \sqrt{\mathrm{diag}\big[(A^{T} W A)^{-1}\big]\cdot\max\big(1, \chi^2/\nu\big)}, \qquad \nu = 2n - 5 .
 ```
 
 WISE detections of the target are selected by proper motion only. Parallax plays no part in the
@@ -302,20 +302,20 @@ d\,[\mathrm{pc}] = \frac{1}{\varpi\,['']}, \qquad v_t\,[\mathrm{km/s}] = 4.74\,\
 ```
 
 The first is the definition of the parsec. For the second, 1″ per year at 1 pc is 1 au per year,
-and $1.496\times10^{8}\ \mathrm{km} / 3.156\times10^{7}\ \mathrm{s} = 4.74$ km/s.
+and $`1.496\times10^{8}\ \mathrm{km} / 3.156\times10^{7}\ \mathrm{s} = 4.74`$ km/s.
 
 ### 11. Is it real? Controls
 
 To remove crowding, the flux in a long band is corrected with the flux in the 2.4-3.8 µm band:
-$E = F - c\,F_{\mathrm{ref}}$, where $c$ is the median slope between pairs of blank positions. The
-excesses $E_b$ in the bands $b$ are combined with a Y dwarf template $T_b$:
+$`E = F - c\,F_{\mathrm{ref}}`$, where $`c`$ is the median slope between pairs of blank positions. The
+excesses $`E_b`$ in the bands $`b`$ are combined with a Y dwarf template $`T_b`$:
 
 ```math
 S = \frac{\sum_b T_b E_b / \sigma_b^2}{\sqrt{\sum_b T_b^2 / \sigma_b^2}}, \qquad p = \frac{n + 1}{N + 1} .
 ```
 
-The same statistic is measured at $N$ blank positions, and $n$ of them reach the value at the
-target. The target counts as one more draw, so $p$ can never be zero with a finite number of
+The same statistic is measured at $`N`$ blank positions, and $`n`$ of them reach the value at the
+target. The target counts as one more draw, so $`p`$ can never be zero with a finite number of
 controls. The measurement is also repeated at the mirror positions of the neighbor stars.
 
 ### 12. A light curve from a survey that never repeats a wavelength
@@ -326,24 +326,24 @@ For a variable star the color and the time are separated:
 \ln F(\lambda, t) = s(\lambda) + a(t), \qquad \sum_k a(t_k) = 0, \qquad \Delta m(t) = \frac{2.5}{\ln 10}\,a(t) .
 ```
 
-The period $P$ is scanned in steps of 0.5 day with
-$\Delta m(t) \approx c_0 + c_1 \sin(2\pi t/P) + c_2 \cos(2\pi t/P)$. If the core is saturated, the
+The period $`P`$ is scanned in steps of 0.5 day with
+$`\Delta m(t) \approx c_0 + c_1 \sin(2\pi t/P) + c_2 \cos(2\pi t/P)`$. If the core is saturated, the
 flux is measured from the wings of the image.
 
 ### 13. Depth in the headset
 
-A plate of width $W$ at distance $D$ shows a field of angle $\theta$. A shift $\Delta$ on the sky
-between the two dates becomes a disparity $d$ on the plate. With eye separation $\mathrm{IPD}$,
-similar triangles give the distance $Z$ at which the two lines of sight meet:
+A plate of width $`W`$ at distance $`D`$ shows a field of angle $`\theta`$. A shift $`\Delta`$ on the sky
+between the two dates becomes a disparity $`d`$ on the plate. With eye separation $`\mathrm{IPD}`$,
+similar triangles give the distance $`Z`$ at which the two lines of sight meet:
 
 ```math
 Z = D\,\frac{\mathrm{IPD}}{\mathrm{IPD} - d}, \qquad d = \Delta\,\frac{W}{\theta}, \qquad
 M = \frac{2\arctan(W/2D)}{\theta} .
 ```
 
-$M$ is the magnification of the sky. The lines of sight become parallel at $d = \mathrm{IPD}$. With
-$W = 1.6$ m, $D = 2.0$ m, $\mathrm{IPD} = 63$ mm and $\theta = 5'$ this limit is
-$\Delta = \mathrm{IPD}\cdot\theta/W = 11.8''$, and $M \approx 520$.
+$`M`$ is the magnification of the sky. The lines of sight become parallel at $`d = \mathrm{IPD}`$. With
+$`W = 1.6`$ m, $`D = 2.0`$ m, $`\mathrm{IPD} = 63`$ mm and $`\theta = 5'`$ this limit is
+$`\Delta = \mathrm{IPD}\cdot\theta/W = 11.8''`$, and $`M \approx 520`$.
 
 ### 14. The injection test
 
@@ -357,13 +357,13 @@ F_{\mathrm{inj}} = \frac{S}{N}\cdot\max\big(\sigma_F^{A}, \sigma_F^{B}\big) .
 ```
 
 The machine observer smooths the difference frame over 3 × 3 pixels and divides it by its robust
-scatter. A source is "found" when $z \ge 5$ at an injected position:
+scatter. A source is "found" when $`z \ge 5`$ at an injected position:
 
 ```math
-z = \frac{\big|\langle B - A\rangle_{3\times3} - \operatorname{med}\big|}{1.4826\cdot\mathrm{MAD}} .
+z = \frac{\big|\langle B - A\rangle_{3\times3} - \mathrm{med}\big|}{1.4826\cdot\mathrm{MAD}} .
 ```
 
-Hit rates $\hat{p} = k/n$ are reported with the Wilson interval
+Hit rates $`\hat{p} = k/n`$ are reported with the Wilson interval
 
 ```math
 \frac{\hat{p} + \frac{1}{2n} \pm \sqrt{\frac{\hat{p}(1-\hat{p})}{n} + \frac{1}{4n^2}}}{1 + \frac{1}{n}} .
@@ -371,9 +371,9 @@ Hit rates $\hat{p} = k/n$ are reported with the Wilson interval
 
 ### 15. A planet far from the Sun
 
-The parallax of a body at $r$ au is $\varpi = 206\,265''/r$. At 500 au this is 412″. SPHEREx sees a
+The parallax of a body at $`r`$ au is $`\varpi = 206\,265''/r`$. At 500 au this is 412″. SPHEREx sees a
 field about six months apart from opposite sides of the Sun (parallax factors −0.97, +0.92, −0.97
-for WISE 0855), so the body shifts by about $1.9 \times 412'' \approx 13'$ between two visits. With
+for WISE 0855), so the body shifts by about $`1.9 \times 412'' \approx 13'`$ between two visits. With
 real orbits the simulation page gives 13.8′-16.0′. This is wider than the 5′ plate and the 8.3′
 window. It is a calculation; no such search was run.
 
@@ -432,7 +432,7 @@ prediction above.
 
 Systematic error: the first half of the WISE epochs gives 0.597 ± 0.062″ and the second half
 0.406 ± 0.047″. The difference is 0.191″, 2.4 times the combined noise of 0.078″. Half of the part
-that noise does not explain is taken as systematic: $\sqrt{0.191^2 - 0.078^2}/2 = 0.087''$. The
+that noise does not explain is taken as systematic: $`\sqrt{0.191^2 - 0.078^2}/2 = 0.087''`$. The
 result is **0.50 ± 0.04 (stat.) ± 0.09 (sys.)″**, about 2.0 pc (published 2.28 pc).
 
 Spectral signature: −12 ± 6 µJy at 2.4-3.8 µm, +274 ± 11 at 3.8-4.4 µm, +514 ± 21 at 4.4-5.0 µm.
