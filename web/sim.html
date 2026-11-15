@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ektos: simulation</title>
+<meta name="description" content="The solar system, the orbit of SPHEREx, the track of a body on the sky and its light, from the equations of Kepler, Newton and Planck, in the browser and checked against real measurements.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 fill=%22%2305070D%22/%3E%3Ccircle cx=%2212%22 cy=%2216%22 r=%227%22 fill=%22%23FF6F5E%22/%3E%3Ccircle cx=%2220%22 cy=%2216%22 r=%227%22 fill=%22%235BB5FF%22 fill-opacity=%220.85%22/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+<style>
+  .sim { max-width: 84rem; margin: 0 auto; padding: 3rem 1.6rem 4rem; }
+  .sim h1 { font-size: var(--step-3); font-weight: 300; line-height: 1.05; letter-spacing: -0.02em; }
+  .sim .lead { margin-top: 1rem; max-width: 62ch; color: var(--ink-soft); font-size: var(--step-1); line-height: 1.55; }
+
+  .clock { position: sticky; top: 0; z-index: 5; display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem 1.4rem; margin-top: 2.4rem; padding: 0.8rem 0; background: rgba(5, 7, 13, 0.94); border-top: 1px solid var(--rule-strong); border-bottom: 1px solid var(--rule); backdrop-filter: blur(6px); }
+  .clock .now { min-width: 15.5rem; font-size: var(--step-2); font-weight: 300; letter-spacing: 0.01em; }
+  .clock .now small { margin-left: 0.6rem; color: var(--ink-faint); font-size: var(--step--1); letter-spacing: 0.08em; }
+  .clock .grp2 { display: flex; align-items: center; gap: 0.4rem; }
+  .clock button { min-width: 2.4rem; padding: 0.3rem 0.6rem; }
+  .clock select, .clock input { padding: 0.28rem 0.45rem; font-size: var(--step--1); }
+  .clock .warn { margin-left: auto; color: var(--epoch-a); font-size: var(--step--1); }
+
+  .ins { display: grid; grid-template-columns: minmax(0, 1fr) 19.5rem; gap: 0 2.4rem; padding: 2.6rem 0 2.8rem; border-bottom: 1px solid var(--rule); }
+  .ins header { grid-column: 1 / -1; display: grid; grid-template-columns: 3rem minmax(0, 1fr); align-items: baseline; margin-bottom: 1.3rem; }
+  .ins header b { color: var(--signal); font-size: var(--step--2); font-weight: 400; letter-spacing: 0.22em; }
+  .ins h2 { font-size: var(--step-2); font-weight: 300; letter-spacing: -0.005em; }
+  .ins header p { grid-column: 2; margin-top: 0.45rem; max-width: 70ch; color: var(--ink-soft); font-size: var(--step-0); }
+  .view { position: relative; min-width: 0; }
+  .view canvas { display: block; width: 100%; background: var(--deep); border: 1px solid var(--rule-strong); touch-action: none; }
+  .view canvas.drag { cursor: grab; }
+  .view canvas.drag:active { cursor: grabbing; }
+  .view .hint { margin-top: 0.5rem; color: var(--ink-faint); font-size: var(--step--1); }
+
+  .led { min-width: 0; font-size: var(--step--1); }
+  .led h3 { margin: 1.2rem 0 0.35rem; color: var(--ink-faint); font-size: var(--step--2); font-weight: 400; letter-spacing: 0.16em; text-transform: uppercase; }
+  .led h3:first-child { margin-top: 0; }
+  .led .note { margin-top: 0.4rem; color: var(--ink-faint); font-size: var(--step--2); line-height: 1.5; }
+  .led dl { display: grid; grid-template-columns: minmax(0, 1fr) auto; margin: 0; }
+  .led dt, .led dd { margin: 0; padding: 0.36rem 0; border-top: 1px solid var(--rule); }
+  .led dt { color: var(--ink-soft); }
+  .led dd { text-align: right; white-space: nowrap; }
+  .led dd.yes { color: var(--good); }
+  .led dd.no { color: var(--epoch-a); }
+  .pick { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+  .pick button { padding: 0.22rem 0.55rem; font-size: var(--step--1); }
+  .seg { display: inline-flex; }
+  .seg button { padding: 0.22rem 0.6rem; font-size: var(--step--1); }
+  .seg button + button { border-left: 0; }
+
+  .sl { display: grid; grid-template-columns: 6.2rem minmax(0, 1fr) 4.6rem; align-items: center; gap: 0.6rem; padding: 0.3rem 0; border-top: 1px solid var(--rule); }
+  .sl span { color: var(--ink-soft); }
+  .sl input { width: 100%; }
+  .sl output { text-align: right; }
+
+  table.chk { width: 100%; border-collapse: collapse; font-size: var(--step--1); }
+  .chk th { padding: 0.5rem 0.8rem 0.5rem 0; color: var(--ink-faint); font-size: var(--step--2); font-weight: 400; letter-spacing: 0.14em; text-align: left; text-transform: uppercase; border-bottom: 1px solid var(--rule-strong); }
+  .chk td { padding: 0.55rem 0.8rem 0.55rem 0; vertical-align: top; border-bottom: 1px solid var(--rule); }
+  .chk td:first-child { color: var(--ink-soft); width: 30%; }
+  .chk td.ok { color: var(--good); white-space: nowrap; }
+  .chk td.bad { color: var(--epoch-a); white-space: nowrap; }
+  .chk .ctl { color: var(--ink-faint); }
+  .limits { margin-top: 1.6rem; max-width: 80ch; color: var(--ink-soft); font-size: var(--step-0); }
+  .limits li { margin-top: 0.4rem; }
+
+  @media (max-width: 62rem) { .ins { grid-template-columns: minmax(0, 1fr); } .led { margin-top: 1.4rem; } }
+</style>
+</head>
+<body>
+<header id="site"></header>
+<main class="sim">
+  <h1><span class="en">Simulation</span></h1>
+  <p class="lead en">The solar system, SPHEREx's orbit around the Earth, a body's track on the sky and its light, all on one clock. Positions come from Kepler's equation, speeds from Newton, light from Planck's law. SPHEREx's orbit and its rule for where it looks were measured from real exposures. The end of the page says what each calculation was checked against.</p>
+
+  <div class="clock" role="group" aria-label="Clock">
+    <div class="now"><span id="now">—</span><small>UTC</small></div>
+    <div class="grp2">
+      <button id="back" type="button" title="Run backwards" aria-label="Back">◀</button>
+      <button id="play" type="button" aria-pressed="true" title="Play or pause">❚❚</button>
+      <button id="fwd" type="button" title="Run forwards" aria-label="Forward">▶</button>
+    </div>
+    <label><span class="en">Speed</span>
+      <select id="rate">
+        <option value="0.0006944">1 s = 1 min</option>
+        <option value="0.041667">1 s = 1 h</option>
+        <option value="1" selected>1 s = 1 day</option>
+        <option value="7">1 s = 1 week</option>
+        <option value="30.4375">1 s = 1 month</option>
+        <option value="365.25">1 s = 1 year</option>
+        <option value="3652.5">1 s = 10 years</option>
+      </select></label>
+    <label><span class="en">Date</span> <input id="date" type="date" min="1800-01-01" max="2050-12-31"></label>
+    <button id="today" type="button"><span class="en">Now</span></button>
+    <span id="warn" class="warn" hidden></span>
+  </div>
+
+  <section class="ins" id="s1">
+    <header><b>01</b><h2><span class="en">The solar system</span></h2>
+      <p class="en">Eight planets and Planet X around the Sun. Every position is Kepler's equation solved for that moment. Distance is logarithmic by default so that far bodies fit.</p></header>
+    <div class="view">
+      <canvas id="cv1" class="drag" height="620"></canvas>
+      <p class="hint en">Drag: turn · Wheel: zoom · Click: pick a body. The dashed line is the view from the Earth to the chosen body.</p>
+    </div>
+    <div class="led">
+      <h3><span class="en">Body</span></h3>
+      <div class="pick" id="pick"></div>
+      <h3><span class="en">Distance scale</span></h3>
+      <div class="seg" id="scale"><button type="button" data-v="log">log</button><button type="button" data-v="lin"><span class="en">linear</span></button></div>
+      <h3 id="selName">—</h3>
+      <dl id="out1"></dl>
+      <p class="note" id="note1"></p>
+    </div>
+  </section>
+
+  <section class="ins" id="s2">
+    <header><b>02</b><h2><span class="en">Set up Planet X</span></h2>
+      <p class="en">Choose its orbit and body. The defaults are only an example, not a real proposal. The results say whether SPHEREx could see such a body.</p></header>
+    <div class="view led" id="xsl"></div>
+    <div class="led">
+      <h3><span class="en">What comes out</span></h3>
+      <dl id="out2"></dl>
+      <p class="note en">The 275 µJy limit was measured on the WISE 0855 plate with injected bodies shifted 12″ between visits 1 and 2. Planet X moves much further between visits, so for it the limit is only a guide.</p>
+    </div>
+  </section>
+
+  <section class="ins" id="s3">
+    <header><b>03</b><h2><span class="en">The track on the sky</span></h2>
+      <p class="en">The chosen body's path as seen from the Earth, with the light travel time included. The thick parts are the days SPHEREx can look that way: when the Sun is 80–120° from the body.</p></header>
+    <div class="view">
+      <canvas id="cv3" height="560"></canvas>
+      <p class="hint en">North up, east left. The squares are Ektos's two plate sizes (5.0′ and 8.3′), centred on today's position.</p>
+    </div>
+    <div class="led">
+      <h3><span class="en">Span</span></h3>
+      <div class="seg" id="span"><button type="button" data-v="60">60 <span class="en">d</span></button><button type="button" data-v="365.25">1 <span class="en">yr</span></button><button type="button" data-v="1095.75">3 <span class="en">yr</span></button><button type="button" data-v="3652.5">10 <span class="en">yr</span></button></div>
+      <h3><span class="en">What comes out</span></h3>
+      <dl id="out3"></dl>
+      <p class="note" id="note3"></p>
+    </div>
+  </section>
+
+  <section class="ins" id="s4">
+    <header><b>04</b><h2><span class="en">Light</span></h2>
+      <p class="en">The flux reaching SPHEREx from the body over 0.75–5 µm. It has two sources: reflected sunlight and the body's own heat. Both the Sun and the body are treated as blackbodies.</p></header>
+    <div class="view">
+      <canvas id="cv4" height="440"></canvas>
+      <p class="hint en">Dashed: reflected · dotted: thermal · solid: total · flat line: measured limit · squares: the flux SPHEREx measured for WISE 0855.</p>
+    </div>
+    <div class="led">
+      <div id="bdsl"></div>
+      <h3><span class="en">At 4.6 µm</span></h3>
+      <dl id="out4"></dl>
+      <p class="note" id="note4"></p>
+    </div>
+  </section>
+
+  <section class="ins" id="s5">
+    <header><b>05</b><h2><span class="en">SPHEREx's orbit</span></h2>
+      <p class="en">The spacecraft passes over the Earth's poles, and its orbital plane turns once a year so it stays in the same place relative to the Sun. Height, inclination and node were measured from the spacecraft positions of 8989 cached exposures. The amber dot is the model; the hollow rings are the spacecraft's real positions on those days.</p></header>
+    <div class="view">
+      <canvas id="cv5" class="drag" height="520"></canvas>
+      <p class="hint en">Drag: turn. Set the clock to "1 s = 1 min" for this panel. The lit half faces the Sun.</p>
+    </div>
+    <div class="led">
+      <h3><span class="en">Measured and computed</span></h3>
+      <dl id="out5"></dl>
+      <p class="note" id="note5"></p>
+    </div>
+  </section>
+
+  <section class="ins" id="s6" style="grid-template-columns: minmax(0, 1fr)">
+    <header><b>06</b><h2><span class="en">Checks</span></h2>
+      <p class="en">Every calculation was compared with an independent number. Most rows are recomputed in the browser when this page opens. Those marked "Python" were measured once in Python.</p></header>
+    <table class="chk"><thead><tr><th><span class="en">Check</span></th><th><span class="en">Simulation</span></th><th><span class="en">Compared with</span></th><th><span class="en">Result</span></th></tr></thead><tbody id="chk"></tbody></table>
+    <ul class="limits en">
+      <li>Planet positions come from mean orbits. These include the planets' pull on each other on average, but leave errors of up to 10′ for Jupiter and Saturn. The table is valid only for 1800–2050.</li>
+      <li>Planet X moves under the Sun's pull alone. Its pull on the planets, and theirs on it, is not included.</li>
+      <li>Light is computed as a blackbody. For real cold atmospheres this can be badly wrong: it underpredicts WISE 0855's 4.4–5 µm flux by a factor of about 19 (measured).</li>
+      <li>SPHEREx's pointing rule (80–120° from the Sun) says when a field can be seen. It is not the spacecraft's real observing schedule.</li>
+      <li>No Moon, no Earth rotation, no atmosphere. The clock is UTC; the 69 s difference from TT is ignored.</li>
+    </ul>
+  </section>
+</main>
+<script type="module" src="sim.js"></script>
+</body>
+</html>

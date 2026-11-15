@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ektos: engine parity check</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 fill=%22%2305070D%22/%3E%3Ccircle cx=%2212%22 cy=%2216%22 r=%227%22 fill=%22%23FF6F5E%22/%3E%3Ccircle cx=%2220%22 cy=%2216%22 r=%227%22 fill=%22%235BB5FF%22 fill-opacity=%220.85%22/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+<style>
+  table { border-collapse: collapse; width: 100%; margin-top: 1.4rem; }
+  th, td { text-align: left; padding: 0.5rem 0.8rem 0.5rem 0; border-bottom: 1px solid var(--rule); font-size: var(--step--1); }
+  th { color: var(--ink-faint); font-weight: 400; font-size: var(--step--2); letter-spacing: 0.12em; text-transform: uppercase; border-bottom-color: var(--rule-strong); }
+  td.num, th.num { text-align: right; }
+</style>
+</head>
+<body>
+<main class="page">
+  <p class="kicker">Engine check</p>
+  <h1 class="display" style="max-width:24ch">Do the Python engine and the browser engine give the same number?</h1>
+  <p>On the left are the reference values written by <code>python -m ektos.parity</code> (<code>data/parity.json</code>). On the right are the
+  values this page computes now from the same package with <code>engine.js</code> and <code>experiment.js</code>.</p>
+  <p id="what"></p>
+  <table id="tab"><thead><tr><th>Check</th><th class="num">Values</th><th class="num">Largest difference</th><th>Result</th></tr></thead><tbody></tbody></table>
+  <p id="verdict"></p>
+</main>
+<script type="module">
+import { initStaticPage } from './site.js';
+initStaticPage('parity.html');
+import * as E from './engine.js';
+import * as X from './experiment.js';
+
+const rows = [];
+function compare(name, ref, got, tol = 1e-5) {
+  let worst = 0, n = 0, mismatch = 0, scale = 0;
+  for (const v of ref) if (v !== null && Math.abs(v) > scale) scale = Math.abs(v);
+  for (let i = 0; i < ref.length; i++) {
+    const a = ref[i], b = got[i], an = a === null || a !== a, bn = b === null || b === undefined || b !== b;
+    if (an || bn) { if (an !== bn) mismatch++; continue; }
+    n++; worst = Math.max(worst, Math.abs(a - b) / (scale || 1));
+  }
+  rows.push({ name, n, worst, ok: !mismatch && ref.length === got.length && worst <= tol, note: mismatch ? `${mismatch} empty/NaN mismatches` : '' });
+}
+function exact(name, ref, got) {
+  const a = JSON.stringify(ref), b = JSON.stringify(got);
+  rows.push({ name, n: Array.isArray(ref) ? ref.length : Object.keys(ref).length, worst: a === b ? 0 : NaN, ok: a === b, note: a === b ? '' : 'differs' });
+}
+const sample = (img, n, step) => { const out = []; for (let r = 0; r < n; r += step) for (let c = 0; c < n; c += step) out.push(img[r * n + c]); return out; };
+
+try {
+  const ref = await (await fetch('data/parity.json', { cache: 'no-store' })).json();
+  const pkg = await E.loadPackage(ref.slug), man = pkg.man, grid = E.makeGrid(man.grid.n, man.grid.scale), n = grid.n, lam = ref.lam;
+  document.getElementById('what').textContent = `${man.name}: visits ${ref.va} and ${ref.vb}, ${lam[0]}–${lam[1]} µm.`;
+
+  const ea = E.select(pkg, { visit: ref.va, lam }), fa = E.combine(pkg, ea, grid);
+  compare('Stack: image', ref.stack.img, sample(fa.img, n, ref.step));
+  compare('Stack: error', ref.stack.err, sample(fa.err, n, ref.step));
+
+  const ff = ea.map(e => E.forcedFlux(pkg, e, ref.forced.xi, ref.forced.eta));
+  compare('Forced photometry: flux', ref.forced.flux, ff.map(f => f ? f.flux : null), 1e-7);
+  compare('Forced photometry: error', ref.forced.err, ff.map(f => f ? f.err : null), 1e-7);
+
+  const gn = {}; for (const f of Object.keys(ref.grid_n)) gn[f] = E.gridForFov(+f, man.grid.scale).n;
+  exact('Field-of-view grid size', ref.grid_n, gn);
+
+  const trials = X.makeTrials(n * grid.scale, { seed: 1 });
+  exact('Trial list: order and mode', ref.trials.map(t => [t.id, t.mode, t.snr, t.shift]), trials.map(t => [t.id, t.mode, t.snr, t.shift]));
+  compare('Trial list: position and angle', ref.trials.flatMap(t => [t.xi, t.eta, t.angle]), trials.flatMap(t => [t.xi, t.eta, t.angle]), 1e-12);
+
+  const tr = trials.find(t => t.id === ref.inject.trial), [pa, pb] = X.trialPositions(tr), b = X.buildTrial(pkg, tr, ref.va, ref.vb, lam);
+  compare('Injection: flux and sensitivity', [ref.inject.flux, ref.inject.sigma_a, ref.inject.sigma_b],
+    [b.flux, E.fluxSigma(pkg, ea, pa[0], pa[1]), E.fluxSigma(pkg, E.select(pkg, { visit: ref.vb, lam }), pb[0], pb[1])], 1e-7);
+  const ia = E.combine(b.pkg, E.select(b.pkg, { visit: ref.va, lam }), grid).img, ib = E.combine(b.pkg, E.select(b.pkg, { visit: ref.vb, lam }), grid).img;
+  compare('Enjeksiyon: A karesi / injected frame A', ref.inject.img_a, sample(ia, n, ref.step));
+  compare('Enjeksiyon: B karesi / injected frame B', ref.inject.img_b, sample(ib, n, ref.step));
+  const eaInj = E.select(b.pkg, { visit: ref.va, lam });
+  const rec = eaInj.map((e, i) => { const f1 = E.forcedFlux(b.pkg, e, pa[0], pa[1]), f0 = E.forcedFlux(pkg, ea[i], pa[0], pa[1]); return f0 ? f1.flux - f0.flux : null; }).filter(v => v !== null);
+  compare('Closed loop: recovered flux', ref.inject.recovered_a, rec, 1e-5);
+  const z = X.zmap(ia, ib, n);
+  compare('Machine observer: z map', ref.inject.z, sample(z, n, ref.step), 1e-4);
+  compare('Machine observer: peak at the source', [ref.inject.z_peak], [X.peakNear(z, grid, [pa, pb])], 1e-4);
+
+  const m = X.machine(pkg, grid, ref.va, ref.vb, lam, { seed: 1, reps: 3 });
+  compare('Machine observer: per-trial statistics', ref.machine.trials.flatMap(t => [t.flux, t.z, t.z_control]), m.trials.flatMap(t => [t.flux, t.z, t.z_control]), 1e-4);
+  exact('Machine observer: found, already there', ref.machine.trials.map(t => [t.id, t.found, t.already]), m.trials.map(t => [t.id, t.found, t.already]));
+  exact('Machine observer: false candidates on the blank plate', [ref.machine.false_peaks], [m.false_peaks]);
+
+  const P = ref.parallax, pf = P.mjd.map(t => E.parallaxFactors(P.ra, P.dec, t));
+  compare('Parallax factors against astropy', [...P.pa, ...P.pd], [...pf.map(f => f[0]), ...pf.map(f => f[1])], 2e-4);
+
+  for (const F of ref.fields) {
+    const p2 = await E.loadPackage(F.slug), g2 = E.makeGrid(p2.man.grid.n, p2.man.grid.scale), tag = `${F.slug}: `;
+    const dropped = p2.man.exposures.filter(e => e.ok === false).map(e => e.i);
+    exact(tag + 'unusable exposures', F.dropped, dropped);
+    const e2 = E.select(p2, { visit: F.va, lam: F.lam }), f2 = E.combine(p2, e2, g2);
+    exact(tag + 'exposures in the window', [F.n_window], [e2.length]);
+    compare(tag + 'stack: image', F.stack.img, sample(f2.img, g2.n, ref.step));
+    compare(tag + 'stack: error', F.stack.err, sample(f2.err, g2.n, ref.step));
+    exact(tag + 'stack: exposures per pixel', F.stack.cnt, sample(f2.cnt, g2.n, ref.step));
+    compare(tag + 'noise scale', [F.noise_scale], [E.noiseScale(f2.img, f2.err)], 1e-5);
+    if (F.fits.length) {
+      const js = F.seeds.map(([x, y]) => E.fitCentroid(f2.img, f2.err, g2, x, y));
+      const flagJs = js.map((f, i) => !!f && E.fitAtBound(f, F.seeds[i][0], F.seeds[i][1]));
+      exact(tag + 'Gaussian fit: stopped on a bound', F.at_bound, flagJs);
+      const keep = F.fits.map((f, i) => !F.at_bound[i]);
+      const py = F.fits.filter((f, i) => keep[i]), fits = js.filter((f, i) => keep[i]);
+      const col = (list, k) => list.map(f => (f ? (Array.isArray(f) ? f[k] : [f.xi, f.eta, f.e_xi, f.e_eta, f.amp, f.fwhm, f.snr, f.chi2r][k]) : null));
+      compare(tag + 'Gaussian fit: position', [...col(py, 0), ...col(py, 1)], [...col(fits, 0), ...col(fits, 1)], 1e-5);
+      compare(tag + 'Gaussian fit: position error', [...col(py, 2), ...col(py, 3)], [...col(fits, 2), ...col(fits, 3)], 1e-3);
+      compare(tag + 'Gaussian fit: S/N', col(py, 6), col(fits, 6), 1e-3);
+    }
+    const ff2 = e2.map(e => E.forcedFlux(p2, e, F.forced.xi, F.forced.eta));
+    compare(tag + 'forced photometry: flux', F.forced.flux, ff2.map(f => (f ? f.flux : null)), 1e-7);
+  }
+} catch (err) {
+  rows.push({ name: 'Could not load: ' + err.message, n: 0, worst: NaN, ok: false, note: 'python -m ektos.parity' });
+}
+const tb = document.querySelector('#tab tbody');
+for (const r of rows) {
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td>${r.name}</td><td class="num">${r.n}</td><td class="num">${r.worst === r.worst ? r.worst.toExponential(1) : '—'}</td><td class="${r.ok ? 'ok' : 'bad'}">${r.ok ? 'same' : 'DIFFERENT'} ${r.note}</td>`;
+  tb.append(tr);
+}
+const bad = rows.filter(r => !r.ok).length;
+document.getElementById('verdict').textContent = bad ? `${bad} checks failed.` : `All ${rows.length} checks hold. Differences are relative to the largest value in the image.`;
+window.__parity = rows;
+</script>
+</body>
+</html>

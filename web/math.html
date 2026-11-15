@@ -1,0 +1,666 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ektos: the maths</title>
+<meta name="description" content="Every calculation Ektos uses, from projection to parallax and from stacking to control tests, in fourteen short steps with formulas and figures you can move.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 fill=%22%2305070D%22/%3E%3Ccircle cx=%2212%22 cy=%2216%22 r=%227%22 fill=%22%23FF6F5E%22/%3E%3Ccircle cx=%2220%22 cy=%2216%22 r=%227%22 fill=%22%235BB5FF%22 fill-opacity=%220.85%22/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+<style>
+  .maths { max-width: 76rem; padding-top: 3.4rem; }
+  .maths .display { max-width: 22ch; text-wrap: balance; }
+  .maths .lead + .lead { margin-top: 0.7rem; font-size: var(--step-0); }
+
+  .maths .key { display: flex; flex-wrap: wrap; gap: 0.4rem 2rem; margin-top: 2.2rem; max-width: none; color: var(--ink-faint); font-size: var(--step--2); letter-spacing: 0.14em; text-transform: uppercase; }
+  .key i { display: inline-block; width: 0.55rem; height: 0.55rem; margin-right: 0.6rem; }
+  .key .ka i { background: var(--epoch-a); }
+  .key .kb i { background: var(--epoch-b); }
+  .key .ks i { background: var(--signal); }
+  .key .len { margin-left: auto; }
+
+  .toc { margin-top: 0.9rem; border-top: 1px solid var(--rule-strong); }
+  .toc ol { list-style: none; margin: 0; padding: 0; columns: 2; column-gap: 2.6rem; }
+  .toc li { break-inside: avoid; border-bottom: 1px solid var(--rule); }
+  .toc a { display: grid; grid-template-columns: 2.7rem minmax(0, 1fr); align-items: baseline; padding: 0.55rem 0; color: var(--ink-soft); text-decoration: none; transition: color 0.12s; }
+  .toc a:hover { color: var(--ink); }
+  .toc a b { color: var(--signal); font-size: var(--step--2); font-weight: 400; letter-spacing: 0.2em; }
+
+  .steps { position: relative; margin-top: 3.4rem; }
+  .steps::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 1px; background: var(--rule); }
+  .trace { position: absolute; left: 0; top: 0; width: 1px; height: 0; background: var(--signal); pointer-events: none; }
+
+  .step { display: grid; grid-template-columns: 4.4rem minmax(0, 6fr) minmax(0, 5fr); column-gap: 2.6rem; align-items: start; padding: 3.6rem 0 3.9rem; border-top: 1px solid var(--rule); scroll-margin-top: 0.5rem; }
+  .step .no { position: sticky; top: 1.4rem; padding: 0.5rem 0 0 1.25rem; color: var(--signal); font-size: var(--step--2); line-height: 1; letter-spacing: 0.22em; }
+  .step .no::before { content: ""; position: absolute; left: 0; top: calc(0.5rem + 0.45em); width: 0.75rem; height: 1px; background: var(--signal); }
+
+  .say h2 { margin: 0; max-width: 20ch; font-size: clamp(1.65rem, 2.7vw, 2.25rem); font-weight: 300; line-height: 1.12; letter-spacing: -0.012em; text-wrap: balance; }
+  .say p { margin-top: 1.1rem; max-width: 46ch; color: var(--ink-soft); font-size: var(--step-1); line-height: 1.55; }
+  .say p.fine { max-width: 56ch; font-size: var(--step-0); }
+  .say p.src { max-width: none; margin-top: 0.9rem; color: var(--ink-faint); font-size: var(--step--1); line-height: 1.7; }
+  .say p.src code { color: var(--ink-soft); }
+  .say .tag { margin-right: 0.5rem; vertical-align: 0.12em; }
+
+  math { font-family: "Cambria Math", "STIX Two Math", "Latin Modern Math", math; color: inherit; }
+  .eqn { max-width: 38rem; margin-top: 1.5rem; padding: 1.2rem 0.2rem 1.3rem; border-top: 1px solid var(--rule-strong); border-bottom: 1px solid var(--rule-strong); color: var(--ink); text-align: center; overflow-x: auto; overflow-y: hidden; }
+  .eqn math { font-size: 1.24rem; }
+  .eqn math + math { margin-top: 1.05rem; }
+  .eqn .who { display: block; margin: 0 0 0.75rem; color: var(--ink-faint); font-size: var(--step--2); letter-spacing: 0.14em; text-align: left; text-transform: uppercase; }
+  .eqn math + .who { margin-top: 1.3rem; padding-top: 1rem; border-top: 1px solid var(--rule); }
+
+  .say .sheet { max-width: 38rem; margin-top: 1.5rem; }
+  .say .sym { margin-top: 0.2rem; font-size: var(--step-0); }
+  .sym td { padding: 0.5rem 0 0.55rem; line-height: 1.45; }
+  .sym td:first-child { width: 1%; padding-right: 1.4rem; white-space: nowrap; }
+  .sym math { font-size: 1.1rem; }
+  .sym tr:last-child td { border-bottom-color: var(--rule-strong); }
+
+  .read { display: flex; flex-wrap: wrap; gap: 0 2.4rem; max-width: 38rem; margin: 1.5rem 0 0; }
+  .read div { padding-top: 0.8rem; }
+  .read dt { color: var(--ink-faint); font-size: var(--step--2); letter-spacing: 0.14em; text-transform: uppercase; }
+  .read dd { margin: 0.2rem 0 0; color: var(--ink); font-size: var(--step-2); font-weight: 300; line-height: 1.2; white-space: nowrap; }
+
+  .fig { position: sticky; top: 1.4rem; margin: 0; min-width: 0; }
+  .fig canvas { display: block; width: 100%; height: auto; aspect-ratio: 16 / 10; background: var(--deep); border: 1px solid var(--rule); }
+  .fig canvas.tall { aspect-ratio: 4 / 3; }
+  .fig figcaption { margin-top: 0.65rem; max-width: 62ch; font-size: var(--step--1); line-height: 1.5; }
+  .knob { display: flex; align-items: center; gap: 1rem; padding: 0.55rem 0; border-bottom: 1px solid var(--rule); }
+  .knob label { flex: 1; gap: 1rem; min-width: 0; color: var(--ink-faint); font-size: var(--step--2); letter-spacing: 0.14em; text-transform: uppercase; }
+  .knob .sy { margin-left: -0.5rem; color: var(--ink-soft); font-size: var(--step-0); letter-spacing: 0; text-transform: none; }
+  .knob input[type="range"] { flex: 1; width: auto; min-width: 5rem; margin: 0; }
+  .knob output { flex: none; min-width: 4.6rem; color: var(--ink); font-size: var(--step--1); text-align: right; white-space: nowrap; }
+
+  .end { padding-top: 2.6rem; border-top: 1px solid var(--rule); }
+  .end .lead:first-child { margin-top: 0; }
+  .go { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 1.8rem; }
+  .go a { padding: 0.7rem 1.3rem; border: 1px solid var(--rule-strong); color: var(--ink); text-decoration: none; font-size: var(--step--1); letter-spacing: 0.12em; text-transform: uppercase; transition: border-color 0.12s, background 0.12s, color 0.12s; }
+  .go a:hover { border-color: var(--ink); }
+  .go a.primary { border-color: var(--signal); color: var(--signal); }
+  .go a.primary:hover { background: var(--signal); color: var(--void); }
+
+  @media (max-width: 62rem) {
+    .step { grid-template-columns: minmax(0, 1fr); row-gap: 1.7rem; padding: 2.7rem 0 3rem 1.6rem; }
+    .step .no { position: relative; top: 0; padding: 0; }
+    .step .no::before { left: -1.6rem; top: 0.45em; width: 1rem; }
+    .say h2 { max-width: 26ch; }
+    .say p { max-width: 58ch; }
+    .fig { position: static; max-width: 44rem; }
+    .key .len { margin-left: 0; }
+  }
+  @media (max-width: 40rem) { .toc ol { columns: 1; } .eqn math { font-size: 1.08rem; } }
+</style>
+</head>
+<body>
+<header id="site"></header>
+
+<main class="page maths">
+
+  <p class="kicker"><span class="en">The maths</span></p>
+  <h1 class="display">
+    <span class="en">All the maths the tool does, in fourteen short steps.</span>
+  </h1>
+  <p class="lead en">Ektos is a blink and stereo comparator: it shows the same patch of sky at two dates and measures what moved. This page goes through the formulas behind those measurements, one by one. Each step first says what the formula is for; then come the formula itself, the meaning of its symbols, and a small figure you can play with.</p>
+  <p class="lead en">The formulas are taken straight from the tool’s code; each step names the file they live in. The numbers are the measurements in the repository’s README.</p>
+
+  <p class="key">
+    <span class="ka"><i></i><span class="en">A · earlier epoch</span></span>
+    <span class="kb"><i></i><span class="en">B · later epoch</span></span>
+    <span class="ks"><i></i><span class="en">live or selected</span></span>
+    <span class="len"><span class="en">14 steps · the sliders are yours</span></span>
+  </p>
+
+  <nav class="toc" id="contents" aria-label="Contents">
+    <ol>
+      <li><a href="#m-01"><b>01</b><span><span class="en">From the sky to the plate</span></span></a></li>
+      <li><a href="#m-02"><b>02</b><span><span class="en">Sky level and noise</span></span></a></li>
+      <li><a href="#m-03"><b>03</b><span><span class="en">Onto the common grid</span></span></a></li>
+      <li><a href="#m-04"><b>04</b><span><span class="en">Stacking the exposures</span></span></a></li>
+      <li><a href="#m-05"><b>05</b><span><span class="en">How bright a source is</span></span></a></li>
+      <li><a href="#m-06"><b>06</b><span><span class="en">Where a source is</span></span></a></li>
+      <li><a href="#m-07"><b>07</b><span><span class="en">Removing ordinary stars</span></span></a></li>
+      <li><a href="#m-08"><b>08</b><span><span class="en">The motion model</span></span></a></li>
+      <li><a href="#m-09"><b>09</b><span><span class="en">From parallax to distance and speed</span></span></a></li>
+      <li><a href="#m-10"><b>10</b><span><span class="en">Is it real? Controls</span></span></a></li>
+      <li><a href="#m-11"><b>11</b><span><span class="en">Light curve and period</span></span></a></li>
+      <li><a href="#m-12"><b>12</b><span><span class="en">Stereo depth</span></span></a></li>
+      <li><a href="#m-13"><b>13</b><span><span class="en">The injection test</span></span></a></li>
+      <li><a href="#m-14"><b>14</b><span><span class="en">The cost of reading the archive</span></span></a></li>
+    </ol>
+  </nav>
+
+  <div class="steps">
+    <span class="trace" aria-hidden="true"></span>
+
+    <section class="step" id="m-01">
+      <span class="no">01</span>
+      <div class="say">
+        <h2><span class="en">Where does a point of sky land on the plate?</span></h2>
+        <p class="en">The sky is like the inside of a sphere, but a plate is flat. This formula moves a point on the sphere onto a flat surface that touches the sphere at the centre of the plate. The tool keeps every position on this plane, in arcseconds.</p>
+        <div class="eqn">
+          <math display="block"><mi>ξ</mi><mo>=</mo><mfrac><mrow><mi>cos</mi><mspace width="0.17em"/><mi>δ</mi><mspace width="0.3em"/><mi>sin</mi><mspace width="0.17em"/><mi mathvariant="normal">Δ</mi><mi>α</mi></mrow><mrow><mi>cos</mi><mspace width="0.17em"/><mi>c</mi></mrow></mfrac></math>
+          <math display="block"><mi>η</mi><mo>=</mo><mfrac><mrow><mi>cos</mi><mspace width="0.17em"/><msub><mi>δ</mi><mn>0</mn></msub><mspace width="0.3em"/><mi>sin</mi><mspace width="0.17em"/><mi>δ</mi><mo>−</mo><mi>sin</mi><mspace width="0.17em"/><msub><mi>δ</mi><mn>0</mn></msub><mspace width="0.3em"/><mi>cos</mi><mspace width="0.17em"/><mi>δ</mi><mspace width="0.3em"/><mi>cos</mi><mspace width="0.17em"/><mi mathvariant="normal">Δ</mi><mi>α</mi></mrow><mrow><mi>cos</mi><mspace width="0.17em"/><mi>c</mi></mrow></mfrac></math>
+          <math display="block"><mi>cos</mi><mspace width="0.17em"/><mi>c</mi><mo>=</mo><mi>sin</mi><mspace width="0.17em"/><msub><mi>δ</mi><mn>0</mn></msub><mspace width="0.3em"/><mi>sin</mi><mspace width="0.17em"/><mi>δ</mi><mo>+</mo><mi>cos</mi><mspace width="0.17em"/><msub><mi>δ</mi><mn>0</mn></msub><mspace width="0.3em"/><mi>cos</mi><mspace width="0.17em"/><mi>δ</mi><mspace width="0.3em"/><mi>cos</mi><mspace width="0.17em"/><mi mathvariant="normal">Δ</mi><mi>α</mi></math>
+        </div>
+        <table class="sheet sym"><tbody>
+          <tr><td><math><mi>α</mi><mo separator="true">,</mo><mi>δ</mi></math></td><td><span class="en">Right ascension and declination of the point: its longitude and latitude on the sky.</span></td></tr>
+          <tr><td><math><msub><mi>α</mi><mn>0</mn></msub><mo separator="true">,</mo><msub><mi>δ</mi><mn>0</mn></msub></math></td><td><span class="en">The centre of the plate.</span></td></tr>
+          <tr><td><math><mi mathvariant="normal">Δ</mi><mi>α</mi></math></td><td><math><mi>α</mi><mo>−</mo><msub><mi>α</mi><mn>0</mn></msub></math></td></tr>
+          <tr><td><math><mi>ξ</mi><mo separator="true">,</mo><mi>η</mi></math></td><td><span class="en">Distance from the centre on the plate, to the east and to the north. The formula gives radians; multiply by 206 264.8 to get arcseconds.</span></td></tr>
+          <tr><td><math><mi>c</mi></math></td><td><span class="en">The angle between the point and the centre of the plate.</span></td></tr>
+        </tbody></table>
+        <p class="src"><span class="en">In the code:</span> <code>geom.py</code> · <code>tan_project</code>, <code>engine.js</code> · <code>tanProject</code></p>
+      </div>
+      <figure class="fig">
+        <canvas data-scene="gnomonic"
+          data-en="Side view: an arc of the celestial sphere and the flat plate touching it at the top. A line from the centre of the sphere through the star hits the plate."></canvas>
+        <div class="knob">
+          <label><span class="en">distance from the centre</span><span class="sy">θ</span>
+            <input type="range" data-k="theta" min="0" max="55" step="0.5" value="30" data-d="1" data-u="°"></label>
+          <output></output>
+        </div>
+        <figcaption class="note">
+          <span class="en">Side view, schematic. The observer sits at the centre of the sphere; the line through the star hits the plate. Away from the centre, the distance on the plate (tan θ) grows faster than the distance on the sphere (θ). A real plate is so small that the difference cannot be measured; the number at the bottom of the figure shows this.</span>
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="step" id="m-02">
+      <span class="no">02</span>
+      <div class="say">
+        <h2><span class="en">Sky level and noise of one exposure</span></h2>
+        <p class="en">In every exposure the sky itself glows a little, and every pixel is a little noisy. We have to measure both without being fooled by the stars. So we use the median instead of the mean: the value in the middle when the pixels are sorted. Pixels that are far off are thrown away, and the calculation is repeated.</p>
+        <div class="eqn">
+          <math display="block"><mi>m</mi><mo>=</mo><mi>med</mi><mo stretchy="false">(</mo><mi>v</mi><mo stretchy="false">)</mo><mspace width="2em"/><mi>σ</mi><mo>=</mo><mn>1.4826</mn><mo>·</mo><mi>med</mi><mrow><mo stretchy="false">(</mo><mrow><mo stretchy="false">|</mo><mrow><mi>v</mi><mo>−</mo><mi>m</mi></mrow><mo stretchy="false">|</mo></mrow><mo stretchy="false">)</mo></mrow></math>
+          <math display="block"><mrow><mo stretchy="false">|</mo><mrow><mi>v</mi><mo>−</mo><mi>m</mi></mrow><mo stretchy="false">|</mo></mrow><mo>&lt;</mo><mn>3</mn><mi>σ</mi></math>
+        </div>
+        <table class="sheet sym"><tbody>
+          <tr><td><math><mi>v</mi></math></td><td><span class="en">The pixel values in the window of the exposure.</span></td></tr>
+          <tr><td><math><mi>m</mi></math></td><td><span class="en">The sky level. It is subtracted from every pixel.</span></td></tr>
+          <tr><td><math><mi>σ</mi></math></td><td><span class="en">The noise of one pixel. Later steps use it as a weight.</span></td></tr>
+          <tr><td><math><mi>med</mi></math></td><td><span class="en">The median. A few bright pixels shift the mean, but they cannot shift the median.</span></td></tr>
+          <tr><td><math><mn>1.4826</mn></math></td><td><span class="en">For bell-shaped noise, the number that turns the median of the deviations into a standard deviation.</span></td></tr>
+          <tr><td><math><mn>3</mn><mi>σ</mi></math></td><td><span class="en">The second line is the clipping rule: only pixels closer than 3σ to the sky level stay, and m and σ are computed again. Five rounds.</span></td></tr>
+        </tbody></table>
+        <p class="src"><span class="en">In the code:</span> <code>frames.py</code> · <code>background</code></p>
+      </div>
+      <figure class="fig">
+        <canvas data-scene="sky"
+          data-en="The distribution of pixel values: a narrow peak on the left and a long tail from stars on the right. The mean moves towards the tail, the median stays on the peak; the ±3σ band narrows round by round."></canvas>
+        <figcaption class="note">
+          <span class="en">Schematic: 2401 synthetic pixels (49 × 49); the calculation really runs on this page. Pixels with stars in them make the tail on the right. The mean moves towards the tail; the median stays where it is. In each round the amber band (±3σ) gets a little narrower, and the pixels outside it are thrown away.</span>
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="step" id="m-03">
+      <span class="no">03</span>
+      <div class="say">
+        <h2><span class="en">Putting an exposure on the common grid</span></h2>
+        <p class="en">Each exposure looks at the sky at a different angle. To compare them, we move them all onto one grid with north up. First we find which pixel of the exposure each grid point falls on. Then we work out the value at that point from the four nearest pixels.</p>
+        <div class="eqn">
+          <math display="block"><mrow><mo>(</mo><mtable><mtr><mtd><mi>ξ</mi></mtd></mtr><mtr><mtd><mi>η</mi></mtd></mtr></mtable><mo>)</mo></mrow><mo>=</mo><mi>M</mi><mrow><mo>(</mo><mtable><mtr><mtd><mi>x</mi></mtd></mtr><mtr><mtd><mi>y</mi></mtd></mtr></mtable><mo>)</mo></mrow><mo>+</mo><mi>c</mi><mspace width="2em"/><mrow><mo>(</mo><mtable><mtr><mtd><mi>x</mi></mtd></mtr><mtr><mtd><mi>y</mi></mtd></mtr></mtable><mo>)</mo></mrow><mo>=</mo><msup><mi>M</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mrow><mo>(</mo><mtable><mtr><mtd><mi>ξ</mi><mo>−</mo><msub><mi>c</mi><mi>ξ</mi></msub></mtd></mtr><mtr><mtd><mi>η</mi><mo>−</mo><msub><mi>c</mi><mi>η</mi></msub></mtd></mtr></mtable><mo>)</mo></mrow></math>
+          <math display="block"><mi>v</mi><mo>=</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><msub><mi>f</mi><mi>x</mi></msub><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><msub><mi>f</mi><mi>y</mi></msub><mo stretchy="false">)</mo><mspace width="0.17em"/><msub><mi>v</mi><mn>00</mn></msub><mo>+</mo><msub><mi>f</mi><mi>x</mi></msub><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><msub><mi>f</mi><mi>y</mi></msub><mo stretchy="false">)</mo><mspace width="0.17em"/><msub><mi>v</mi><mn>10</mn></msub></math>
+          <math display="block"><mspace width="1.4em"/><mo>+</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><msub><mi>f</mi><mi>x</mi></msub><mo stretchy="false">)</mo><mspace width="0.17em"/><msub><mi>f</mi><mi>y</mi></msub><mspace width="0.17em"/><msub><mi>v</mi><mn>01</mn></msub><mo>+</mo><msub><mi>f</mi><mi>x</mi></msub><mspace width="0.17em"/><msub><mi>f</mi><mi>y</mi></msub><mspace width="0.17em"/><msub><mi>v</mi><mn>11</mn></msub></math>
+        </div>
+        <table class="sheet sym"><tbody>
+          <tr><td><math><mi>x</mi><mo separator="true">,</mo><mi>y</mi></math></td><td><span class="en">Column and row in the exposure’s own pixels.</span></td></tr>
+          <tr><td><math><mi>M</mi></math></td><td><span class="en">A 2 × 2 table of numbers. It holds how many arcseconds one pixel covers on the sky and how far the exposure is turned.</span></td></tr>
+          <tr><td><math><mi>c</mi></math></td><td><span class="en">Where pixel (0, 0) of the exposure sits on the plate.</span></td></tr>
+          <tr><td><math><msub><mi>f</mi><mi>x</mi></msub><mo separator="true">,</mo><msub><mi>f</mi><mi>y</mi></msub></math></td><td><span class="en">The fractional distance of the point from the centre of the first of its four neighbours: between 0 and 1.</span></td></tr>
+          <tr><td><math><msub><mi>v</mi><mn>00</mn></msub><mo>…</mo><msub><mi>v</mi><mn>11</mn></msub></math></td><td><span class="en">The values of the four neighbouring pixels. A closer neighbour gets a bigger share; the four shares add up to 1.</span></td></tr>
+        </tbody></table>
+        <p class="en fine">M and c are found for each exposure separately, by fitting a linear map to 25 points taken from the file’s own coordinate information. The step of the common grid is 3.075″, half a SPHEREx pixel.</p>
+        <p class="src"><span class="en">In the code:</span> <code>cube.py</code> · <code>fetch_exposure</code>, <code>frames.py</code> · <code>reproject</code>, <code>engine.js</code> · <code>reproject</code></p>
+      </div>
+      <figure class="fig">
+        <canvas data-scene="resample"
+          data-en="On the left the tilted pixels of an exposure, with the points of the north-up common grid on top. An amber point walks over the grid; on the right its four neighbouring pixels and their weights."></canvas>
+        <figcaption class="note">
+          <span class="en">Schematic. The tilted squares on the left are the exposure’s own pixels; the small plus signs are the points of the common grid. The amber point visits the grid points in turn; on the right you see its four neighbours and the share of each.</span>
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="step" id="m-04">
+      <span class="no">04</span>
+      <div class="say">
+        <h2><span class="en">Stacking the exposures</span></h2>
+        <p class="en">A single exposure is noisy. When we average the exposures of one visit, the noise drops and faint sources appear. A clean exposure gets a big say, a noisy one a small say. A flash that shows up in only one exposure, such as a cosmic-ray hit, is left out of the average.</p>
+        <div class="eqn">
+          <math display="block"><mover accent="true"><mi>x</mi><mo stretchy="false">¯</mo></mover><mo>=</mo><mfrac><mrow><munder><mo>∑</mo><mi>i</mi></munder><msub><mi>w</mi><mi>i</mi></msub><mspace width="0.17em"/><msub><mi>x</mi><mi>i</mi></msub></mrow><mrow><munder><mo>∑</mo><mi>i</mi></munder><msub><mi>w</mi><mi>i</mi></msub></mrow></mfrac><mspace width="2em"/><msub><mi>w</mi><mi>i</mi></msub><mo>=</mo><mfrac><mn>1</mn><msubsup><mi>σ</mi><mi>i</mi><mn>2</mn></msubsup></mfrac></math>
+          <math display="block"><msub><mi>σ</mi><mover accent="true"><mi>x</mi><mo stretchy="false">¯</mo></mover></msub><mo>=</mo><mfrac><mn>1</mn><msqrt><munder><mo>∑</mo><mi>i</mi></munder><msub><mi>w</mi><mi>i</mi></msub></msqrt></mfrac><mspace width="2em"/><mo>(</mo><msub><mi>σ</mi><mi>i</mi></msub><mo>=</mo><mi>σ</mi><mspace width="0.4em"/><mo>⇒</mo><mspace width="0.4em"/><msub><mi>σ</mi><mover accent="true"><mi>x</mi><mo stretchy="false">¯</mo></mover></msub><mo>=</mo><mfrac><mi>σ</mi><msqrt><mi>N</mi></msqrt></mfrac><mo>)</mo></math>
+          <math display="block"><mrow><mo stretchy="false">|</mo><mrow><msub><mi>x</mi><mi>i</mi></msub><mo>−</mo><mi>med</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow><mo stretchy="false">|</mo></mrow><mo>&gt;</mo><mi>max</mi><mrow><mo stretchy="false">(</mo><mn>8</mn><msub><mi>σ</mi><mi>i</mi></msub><mo separator="true">,</mo><mspace width="0.3em"/><mn>2</mn><mrow><mo stretchy="false">|</mo><mrow><mi>med</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow><mo stretchy="false">|</mo></mrow><mo stretchy="false">)</mo></mrow></math>
+        </div>
+        <table class="sheet sym"><tbody>
+          <tr><td><math><msub><mi>x</mi><mi>i</mi></msub></math></td><td><span class="en">The value of the same grid point in exposure i.</span></td></tr>
+          <tr><td><math><msub><mi>σ</mi><mi>i</mi></msub><mo separator="true">,</mo><msub><mi>w</mi><mi>i</mi></msub></math></td><td><span class="en">The pixel noise of that exposure (step 2) and its weight. Twice the noise means a quarter of the say.</span></td></tr>
+          <tr><td><math><mover accent="true"><mi>x</mi><mo stretchy="false">¯</mo></mover></math></td><td><span class="en">The value in the stack.</span></td></tr>
+          <tr><td><math><msub><mi>σ</mi><mover accent="true"><mi>x</mi><mo stretchy="false">¯</mo></mover></msub></math></td><td><span class="en">The error of the value in the stack. If all exposures have the same noise it is σ/√N: four times the exposures, half the noise.</span></td></tr>
+          <tr><td><math><mi>med</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></math></td><td><span class="en">The median of that point over all the exposures. The third line is the rejection rule: a value that meets it is thrown out.</span></td></tr>
+        </tbody></table>
+        <p class="en fine">The rejection rule works only when there are at least three exposures. The threshold is wide on purpose: a point source falls on a different part of a pixel in each exposure and its flux changes with wavelength, so a tight threshold would also remove real sources.</p>
+        <p class="src"><span class="en">In the code:</span> <code>frames.py</code> · <code>combine</code>, <code>engine.js</code> · <code>combine</code></p>
+      </div>
+      <figure class="fig">
+        <canvas data-scene="stack"
+          data-en="On the left the stack of the chosen number of exposures; on the right the noise falling with the number of exposures, and the one over root N curve."></canvas>
+        <div class="knob">
+          <label><span class="en">number of exposures</span><span class="sy">N</span>
+            <input type="range" data-k="n" min="1" max="64" step="1" value="9" data-d="0"></label>
+          <output></output>
+        </div>
+        <figcaption class="note">
+          <span class="en">Schematic: 64 synthetic exposures; the stack is computed on this page with the rule above. The noise follows the 1/√N curve; the faint source at lower left only shows once there are enough exposures. The first exposure has a cosmic-ray hit (amber corners): it stays with one or two exposures and is rejected as soon as there is a third.</span>
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="step" id="m-05">
+      <span class="no">05</span>
+      <div class="say">
+        <h2><span class="en">How bright is a point source?</span></h2>
+        <p class="en">The light of a star does not fall on one pixel; it spreads over the neighbouring pixels in a known shape, called the PSF. To find the brightness we ask: how much of this shape, plus how much flat sky, explains the pixels best? The first number in the answer is the flux.</p>
+        <div class="eqn">
+          <math display="block"><msub><mi>d</mi><mi>i</mi></msub><mo>≈</mo><mi>F</mi><mspace width="0.17em"/><msub><mi>P</mi><mi>i</mi></msub><mo>+</mo><mi>S</mi><mspace width="2em"/><msub><mi>P</mi><mi>i</mi></msub><mo>=</mo><mfrac><mn>1</mn><mrow><mn>2</mn><mi>π</mi><msup><mi>s</mi><mn>2</mn></msup></mrow></mfrac><mspace width="0.2em"/><mi>exp</mi><mrow><mo>(</mo><mo>−</mo><mfrac><msubsup><mi>r</mi><mi>i</mi><mn>2</mn></msubsup><mrow><mn>2</mn><msup><mi>s</mi><mn>2</mn></msup></mrow></mfrac><mo>)</mo></mrow></math>
+          <math display="block"><mi>F</mi><mo>=</mo><mfrac><mrow><mi>n</mi><mo>∑</mo><msub><mi>P</mi><mi>i</mi></msub><msub><mi>d</mi><mi>i</mi></msub><mo>−</mo><mo>∑</mo><msub><mi>P</mi><mi>i</mi></msub><mspace width="0.2em"/><mo>∑</mo><msub><mi>d</mi><mi>i</mi></msub></mrow><mrow><mi>n</mi><mo>∑</mo><msubsup><mi>P</mi><mi>i</mi><mn>2</mn></msubsup><mo>−</mo><msup><mrow><mo stretchy="false">(</mo><mo>∑</mo><msub><mi>P</mi><mi>i</mi></msub><mo stretchy="false">)</mo></mrow><mn>2</mn></msup></mrow></mfrac><mspace width="2em"/><msub><mi>σ</mi><mi>F</mi></msub><mo>=</mo><mi>σ</mi><msqrt><mfrac><mi>n</mi><mrow><mi>n</mi><mo>∑</mo><msubsup><mi>P</mi><mi>i</mi><mn>2</mn></msubsup><mo>−</mo><msup><mrow><mo stretchy="false">(</mo><mo>∑</mo><msub><mi>P</mi><mi>i</mi></msub><mo stretchy="false">)</mo></mrow><mn>2</mn></msup></mrow></mfrac></msqrt></math>
+          <math display="block"><mi>F</mi><mspace width="0.2em"/><mrow><mo stretchy="false">[</mo><mtext>µJy</mtext><mo stretchy="false">]</mo></mrow><mo>=</mo><mi>F</mi><mspace width="0.2em"/><mrow><mo stretchy="false">[</mo><mtext>MJy/sr</mtext><mo stretchy="false">]</mo></mrow><mo>×</mo><mfrac><mi mathvariant="normal">Ω</mi><mrow><mn>4.2545</mn><mo>×</mo><msup><mn>10</mn><mn>10</mn></msup></mrow></mfrac><mo>×</mo><msup><mn>10</mn><mn>12</mn></msup></math>
+        </div>
+        <table class="sheet sym"><tbody>
+          <tr><td><math><msub><mi>d</mi><mi>i</mi></msub></math></td><td><span class="en">The value of pixel i in the 7 × 7 pixel box around the source.</span></td></tr>
+          <tr><td><math><msub><mi>P</mi><mi>i</mi></msub></math></td><td><span class="en">The value of the PSF at that pixel: a Gaussian peak whose total light is 1.</span></td></tr>
+          <tr><td><math><msub><mi>r</mi><mi>i</mi></msub><mo separator="true">,</mo><mi>s</mi></math></td><td><span class="en">The distance of the pixel from the source, and the width of the peak. s = FWHM / 2.3548; the FWHM (full width at half maximum) is written in the header of each exposure.</span></td></tr>
+          <tr><td><math><mi>F</mi><mo separator="true">,</mo><mi>S</mi></math></td><td><span class="en">The two numbers we look for: the flux of the source and the sky level.</span></td></tr>
+          <tr><td><math><mi>n</mi><mo separator="true">,</mo><mi>σ</mi></math></td><td><span class="en">The number of pixels in the box, and the noise of one pixel (step 2).</span></td></tr>
+          <tr><td><math><msub><mi>σ</mi><mi>F</mi></msub></math></td><td><span class="en">The formal error of the flux: it counts pixel noise only.</span></td></tr>
+          <tr><td><math><mi mathvariant="normal">Ω</mi></math></td><td><span class="en">The area one pixel covers on the sky, in square arcseconds; it is in the header (about 38). 4.2545 × 10¹⁰ is the number of square arcseconds in one steradian; 10¹² turns MJy into µJy.</span></td></tr>
+        </tbody></table>
+        <p class="en fine">This is nothing more than fitting a straight line to points: P on the horizontal axis, d on the vertical axis. The slope of the line is the flux, and the place where it meets the axis is the sky level. If there is another known source nearby, it gets a column of its own and everything is solved together. The Gaussian peak is an approximation: it is good enough for positions and relative fluxes, and leaves a systematic error in absolute fluxes.</p>
+        <p class="src"><span class="en">In the code:</span> <code>phot.py</code> · <code>forced_flux</code>, <code>engine.js</code> · <code>forcedFlux</code></p>
+      </div>
+      <figure class="fig">
+        <canvas data-scene="psf"
+          data-en="On the left a 7 × 7 pixel box; on the right each pixel’s value plotted against its PSF value, with the line that fits the points. The slope of the line is the flux."></canvas>
+        <div class="knob">
+          <label><span class="en">flux of the source</span>
+            <input type="range" data-k="flux" min="0" max="2000" step="10" value="600" data-d="0" data-u=" µJy"></label>
+          <output></output>
+        </div>
+        <figcaption class="note">
+          <span class="en">Schematic: the 7 × 7 pixel box of a single exposure. The noise is fixed; you choose the flux of the source. On the right each pixel is one point, and the slope of the amber line is the measured flux. Even at zero flux the slope is not exactly zero: that is the noise, and the error bar tells you so.</span>
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="step" id="m-06">
+      <span class="no">06</span>
+      <div class="say">
+        <h2><span class="en">Where exactly is a source?</span></h2>
+        <p class="en">The position is the centre of gravity of the light. The two engines find it in different ways, and we say so openly. The Python engine fits a Gaussian peak to the image. The browser engine slides a window onto the source, step by step.</p>
+        <div class="eqn">
+          <span class="who">Python</span>
+          <math display="block"><msub><mi>G</mi><mi>i</mi></msub><mo>=</mo><mi>A</mi><mspace width="0.2em"/><mi>exp</mi><mrow><mo>(</mo><mo>−</mo><mfrac><mrow><msup><mrow><mo stretchy="false">(</mo><msub><mi>x</mi><mi>i</mi></msub><mo>−</mo><msub><mi>x</mi><mn>0</mn></msub><mo stretchy="false">)</mo></mrow><mn>2</mn></msup><mo>+</mo><msup><mrow><mo stretchy="false">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo>−</mo><msub><mi>y</mi><mn>0</mn></msub><mo stretchy="false">)</mo></mrow><mn>2</mn></msup></mrow><mrow><mn>2</mn><msup><mi>s</mi><mn>2</mn></msup></mrow></mfrac><mo>)</mo></mrow><mo>+</mo><mi>B</mi></math>
+          <math display="block"><msup><mi>χ</mi><mn>2</mn></msup><mo>=</mo><munder><mo>∑</mo><mi>i</mi></munder><msup><mrow><mo>(</mo><mfrac><mrow><msub><mi>G</mi><mi>i</mi></msub><mo>−</mo><msub><mi>z</mi><mi>i</mi></msub></mrow><msub><mi>σ</mi><mi>i</mi></msub></mfrac><mo>)</mo></mrow><mn>2</mn></msup><mspace width="0.5em"/><mo>→</mo><mspace width="0.5em"/><mi>min</mi></math>
+          <span class="who"><span class="en">Browser</span></span>
+          <math display="block"><msub><mi>g</mi><mi>i</mi></msub><mo>=</mo><mi>exp</mi><mrow><mo>(</mo><mo>−</mo><mfrac><mrow><msup><mrow><mo stretchy="false">(</mo><msub><mi>x</mi><mi>i</mi></msub><mo>−</mo><msub><mi>x</mi><mi>c</mi></msub><mo stretchy="false">)</mo></mrow><mn>2</mn></msup><mo>+</mo><msup><mrow><mo stretchy="false">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo>−</mo><msub><mi>y</mi><mi>c</mi></msub><mo stretchy="false">)</mo></mrow><mn>2</mn></msup></mrow><mrow><mn>2</mn><msup><mi>s</mi><mn>2</mn></msup></mrow></mfrac><mo>)</mo></mrow></math>
+          <math display="block"><mi mathvariant="normal">Δ</mi><mi>x</mi><mo>=</mo><mn>2</mn><mspace width="0.2em"/><mfrac><mrow><munder><mo>∑</mo><mi>i</mi></munder><msub><mi>g</mi><mi>i</mi></msub><mspace width="0.17em"/><msub><mi>z</mi><mi>i</mi></msub><mspace width="0.17em"/><mo stretchy="false">(</mo><msub><mi>x</mi><mi>i</mi></msub><mo>−</mo><msub><mi>x</mi><mi>c</mi></msub><mo stretchy="false">)</mo></mrow><mrow><munder><mo>∑</mo><mi>i</mi></munder><msub><mi>g</mi><mi>i</mi></msub><mspace width="0.17em"/><msub><mi>z</mi><mi>i</mi></msub></mrow></mfrac><mspace width="2em"/><msub><mi>x</mi><mi>c</mi></msub><mo>←</mo><msub><mi>x</mi><mi>c</mi></msub><mo>+</mo><mi mathvariant="normal">Δ</mi><mi>x</mi></math>
+        </div>
+        <table class="sheet sym"><tbody>
+          <tr><td><math><msub><mi>z</mi><mi>i</mi></msub><mo separator="true">,</mo><msub><mi>σ</mi><mi>i</mi></msub></math></td><td><span class="en">The value and the error of pixel i of the stack; the pixel sits at (x, y).</span></td></tr>
+          <tr><td><math><msub><mi>x</mi><mn>0</mn></msub><mo separator="true">,</mo><msub><mi>y</mi><mn>0</mn></msub></math></td><td><span class="en">The position we look for. A is the height of the peak, B the background, s the width. All five are varied together until χ² is as small as possible.</span></td></tr>
+          <tr><td><math><msup><mi>χ</mi><mn>2</mn></msup></math></td><td><span class="en">The misfit: the sum of the squared differences between model and pixels, in units of the error.</span></td></tr>
+          <tr><td><math><msub><mi>x</mi><mi>c</mi></msub><mo separator="true">,</mo><msub><mi>y</mi><mi>c</mi></msub></math></td><td><span class="en">The current centre of the window. The same formula is used for y.</span></td></tr>
+          <tr><td><math><msub><mi>g</mi><mi>i</mi></msub></math></td><td><span class="en">The weight of the window: a pixel near the centre counts a lot, a far one counts little.</span></td></tr>
+          <tr><td><math><mi mathvariant="normal">Δ</mi><mi>x</mi></math></td><td><span class="en">The correction in one step. It stops when this falls below 0.01″, after 12 steps at most. The 2 in front is there because a window as wide as the source halves the offset that is measured.</span></td></tr>
+        </tbody></table>
+        <p class="en fine"><span class="tag part">Honestly</span>The two methods do not have to give exactly the same answer for the same source. On WISE 0855, after the filter of step 7, the browser finds (−62.34″, +5.11″) and Python finds (−62.35″, +5.13″): a difference of 0.03″.</p>
+        <p class="src"><span class="en">In the code:</span> <code>phot.py</code> · <code>fit_centroid</code>, <code>engine.js</code> · <code>centroid</code></p>
+      </div>
+      <figure class="fig">
+        <canvas data-scene="centroid"
+          data-en="The image of a synthetic source. An amber ring walks from its starting point onto the source, step by step; on the right the size of each step shrinks until it is below 0.01 arcsecond."></canvas>
+        <figcaption class="note">
+          <span class="en">The browser engine’s method on a synthetic source; the calculation runs on this page. The amber ring is the window, the plus sign is the true place of the source. In each step the window moves towards the centre of gravity of the light; the bars on the right show the size of the step.</span>
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="step" id="m-07">
+      <span class="no">07</span>
+      <div class="say">
+        <h2><span class="en">Removing ordinary stars by their colour</span></h2>
+        <p class="en">A cold dwarf is bright at 4–5 µm and almost invisible at 3–3.8 µm. Ordinary stars show in both images, and the ratio of their brightness in the two is nearly the same for all of them. If we multiply the short-wavelength image by this ratio and subtract it from the long-wavelength image, the stars cancel and the cold object stays.</p>
+        <div class="eqn">
+          <math display="block"><mi>R</mi><mo>=</mo><mi>W2s</mi><mo>−</mo><mi>k</mi><mo>·</mo><mi>W1s</mi><mspace width="2em"/><mi>k</mi><mo>=</mo><munder><mi>med</mi><mi>j</mi></munder><mspace width="0.2em"/><mfrac><msub><mi>W2s</mi><mi>j</mi></msub><msub><mi>W1s</mi><mi>j</mi></msub></mfrac></math>
+          <math display="block"><msub><mi>σ</mi><mi>R</mi></msub><mo>=</mo><msqrt><msubsup><mi>σ</mi><mi>W2s</mi><mn>2</mn></msubsup><mo>+</mo><msup><mi>k</mi><mn>2</mn></msup><mspace width="0.17em"/><msubsup><mi>σ</mi><mi>W1s</mi><mn>2</mn></msubsup></msqrt></math>
+        </div>
+        <table class="sheet sym"><tbody>
+          <tr><td><math><mi>W2s</mi></math></td><td><span class="en">The stack of the 4.0–5.0 µm window.</span></td></tr>
+          <tr><td><math><mi>W1s</mi></math></td><td><span class="en">The stack of the 3.0–3.8 µm window.</span></td></tr>
+          <tr><td><math><mi>k</mi></math></td><td><span class="en">The median flux ratio of the field’s own stars. Stars closer than 12″ to the target are left out.</span></td></tr>
+          <tr><td><math><mi>j</mi></math></td><td><span class="en">The reference stars in the field.</span></td></tr>
+          <tr><td><math><mi>R</mi><mo separator="true">,</mo><msub><mi>σ</mi><mi>R</mi></msub></math></td><td><span class="en">The image that is left, and its error. The position (step 6) is measured on this image.</span></td></tr>
+        </tbody></table>
+        <dl class="read">
+          <div><dt><span class="en">WISE 0855, October–December 2025</span></dt><dd>k = 0.655 · 13 <span class="en">stars</span></dd></div>
+          <div><dt><span class="en">April–May 2026</span></dt><dd>k = 0.593 · 10 <span class="en">stars</span></dd></div>
+        </dl>
+        <p class="en fine">Why it is needed: today WISE 0855 sits 4–8″ from a fixed background star. Positions measured with the filter agree with the blind prediction within 1σ; without it, blended with the star, the measurement is off by 6σ in the worst epoch.</p>
+        <p class="src"><span class="en">In the code:</span> <code>package.py</code> · <code>star_colour</code>, <code>analysis.py</code> · <code>spherex_epochs</code>, <code>engine.js</code> · <code>coldFilter</code></p>
+      </div>
+      <figure class="fig">
+        <canvas data-scene="cold"
+          data-en="Three schematic images: W2s, W1s and their difference R. Below, an axis with the ratios of the stars. When k reaches the median the stars fade and the cold source stays."></canvas>
+        <div class="knob">
+          <label><span class="en">ratio</span><span class="sy">k</span>
+            <input type="range" data-k="k" min="0.3" max="1" step="0.005" value="0.655" data-d="3"></label>
+          <output></output>
+        </div>
+        <figcaption class="note">
+          <span class="en">Schematic. The ratio of each of thirteen stars is a tick on the axis below; their median is 0.655. Move the slider to the median: the stars fade, and the cold source inside the amber corners stays. The stars do not vanish completely, because their colours are not exactly the same. If k gets too large the stars turn into dark holes.</span>
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="step" id="m-08">
+      <span class="no">08</span>
+      <div class="say">
+        <h2><span class="en">The motion model: a straight path plus a yearly wobble</span></h2>
+        <p class="en">A nearby object does two things on the sky: it moves along a straight line and, because Earth goes around the Sun, it draws a small wobble once a year. The model is the sum of the two. It has five unknowns, and we find all five together as the values that fit the measured positions best.</p>
+        <div class="eqn">
+          <math display="block"><mi>ξ</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mi>ξ</mi><mn>0</mn></msub><mo>+</mo><msub><mi>μ</mi><mi>ξ</mi></msub><mspace width="0.17em"/><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><msub><mi>t</mi><mn>0</mn></msub><mo stretchy="false">)</mo><mo>+</mo><mi>ϖ</mi><mspace width="0.17em"/><msub><mi>P</mi><mi>α</mi></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></math>
+          <math display="block"><mi>η</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mi>η</mi><mn>0</mn></msub><mo>+</mo><msub><mi>μ</mi><mi>η</mi></msub><mspace width="0.17em"/><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><msub><mi>t</mi><mn>0</mn></msub><mo stretchy="false">)</mo><mo>+</mo><mi>ϖ</mi><mspace width="0.17em"/><msub><mi>P</mi><mi>δ</mi></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></math>
+          <math display="block"><msub><mi>P</mi><mi>α</mi></msub><mo>=</mo><mi>X</mi><mspace width="0.2em"/><mi>sin</mi><mspace width="0.17em"/><mi>α</mi><mo>−</mo><mi>Y</mi><mspace width="0.2em"/><mi>cos</mi><mspace width="0.17em"/><mi>α</mi></math>
+          <math display="block"><msub><mi>P</mi><mi>δ</mi></msub><mo>=</mo><mi>X</mi><mspace width="0.2em"/><mi>cos</mi><mspace width="0.17em"/><mi>α</mi><mspace width="0.3em"/><mi>sin</mi><mspace width="0.17em"/><mi>δ</mi><mo>+</mo><mi>Y</mi><mspace width="0.2em"/><mi>sin</mi><mspace width="0.17em"/><mi>α</mi><mspace width="0.3em"/><mi>sin</mi><mspace width="0.17em"/><mi>δ</mi><mo>−</mo><mi>Z</mi><mspace width="0.2em"/><mi>cos</mi><mspace width="0.17em"/><mi>δ</mi></math>
+          <span class="who"><span class="en">Least squares</span></span>
+          <math display="block"><mover accent="true"><mi>p</mi><mo stretchy="false">^</mo></mover><mo>=</mo><msup><mrow><mo stretchy="false">(</mo><msup><mi>A</mi><mi mathvariant="normal">T</mi></msup><mi>W</mi><mi>A</mi><mo stretchy="false">)</mo></mrow><mrow><mo>−</mo><mn>1</mn></mrow></msup><mspace width="0.2em"/><msup><mi>A</mi><mi mathvariant="normal">T</mi></msup><mi>W</mi><mi>y</mi><mspace width="2em"/><msup><mi>χ</mi><mn>2</mn></msup><mo>=</mo><munder><mo>∑</mo><mi>i</mi></munder><msup><mrow><mo>(</mo><mfrac><msub><mi>r</mi><mi>i</mi></msub><msub><mi>σ</mi><mi>i</mi></msub></mfrac><mo>)</mo></mrow><mn>2</mn></msup></math>
+          <math display="block"><msub><mi>σ</mi><mi>p</mi></msub><mo>=</mo><msqrt><mi>diag</mi><mrow><mo stretchy="false">[</mo><msup><mrow><mo stretchy="false">(</mo><msup><mi>A</mi><mi mathvariant="normal">T</mi></msup><mi>W</mi><mi>A</mi><mo stretchy="false">)</mo></mrow><mrow><mo>−</mo><mn>1</mn></mrow></msup><mo stretchy="false">]</mo></mrow><mo>·</mo><mi>max</mi><mrow><mo>(</mo><mn>1</mn><mo separator="true">,</mo><mspace width="0.3em"/><mfrac><msup><mi>χ</mi><mn>2</mn></msup><mi>ν</mi></mfrac><mo>)</mo></mrow></msqrt><mspace width="2em"/><mi>ν</mi><mo>=</mo><mn>2</mn><mi>n</mi><mo>−</mo><mn>5</mn></math>
+        </div>
+        <table class="sheet sym"><tbody>
+          <tr><td><math><msub><mi>ξ</mi><mn>0</mn></msub><mo separator="true">,</mo><msub><mi>η</mi><mn>0</mn></msub></math></td><td><span class="en">Where the object is at time t₀ (east and north on the plate).</span></td></tr>
+          <tr><td><math><msub><mi>μ</mi><mi>ξ</mi></msub><mo separator="true">,</mo><msub><mi>μ</mi><mi>η</mi></msub></math></td><td><span class="en">Proper motion: how many arcseconds the object moves in a year.</span></td></tr>
+          <tr><td><math><mi>ϖ</mi></math></td><td><span class="en">Parallax: the size of the yearly wobble, in arcseconds.</span></td></tr>
+          <tr><td><math><msub><mi>P</mi><mi>α</mi></msub><mo separator="true">,</mo><msub><mi>P</mi><mi>δ</mi></msub></math></td><td><span class="en">The parallax factors: on that day, which way and how far the object appears shifted because of where Earth is.</span></td></tr>
+          <tr><td><math><mi>X</mi><mo separator="true">,</mo><mi>Y</mi><mo separator="true">,</mo><mi>Z</mi></math></td><td><span class="en">Where Earth is on that day, in astronomical units (our mean distance from the Sun is 1). α and δ are the place of the object on the sky.</span></td></tr>
+          <tr><td><math><mover accent="true"><mi>p</mi><mo stretchy="false">^</mo></mover><mo separator="true">,</mo><mi>y</mi></math></td><td><span class="en">The best values of the five unknowns, and the measured positions (two numbers per epoch).</span></td></tr>
+          <tr><td><math><mi>A</mi><mo separator="true">,</mo><mi>W</mi></math></td><td><span class="en">A is the table that says how much each measurement depends on each unknown; W holds the weights, 1/σ².</span></td></tr>
+          <tr><td><math><msub><mi>r</mi><mi>i</mi></msub><mo separator="true">,</mo><msup><mi>χ</mi><mn>2</mn></msup></math></td><td><span class="en">Measured minus model, and the total misfit.</span></td></tr>
+          <tr><td><math><mi>ν</mi></math></td><td><span class="en">Degrees of freedom: the number of measurements minus the number of unknowns (n is the number of epochs). If the measurements scatter more than their errors allow, χ²/ν is larger than 1 and the errors are made larger by that ratio.</span></td></tr>
+        </tbody></table>
+        <table class="sheet"><thead>
+          <tr><th>WISE 0855</th><th>μ<sub>α</sub> ″/<span class="en">yr</span></th><th>μ<sub>δ</sub> ″/<span class="en">yr</span></th><th>ϖ ″</th><th>χ² / ν</th></tr>
+        </thead><tbody>
+          <tr><td>WISE + SPHEREx</td><td>−8.125 ± 0.009</td><td>+0.686 ± 0.012</td><td>0.502 ± 0.038</td><td>66 / 47</td></tr>
+          <tr><td><span class="en">Published</span></td><td>−8.118 ± 0.008</td><td>+0.680 ± 0.007</td><td>0.439 ± 0.002</td><td></td></tr>
+        </tbody></table>
+        <p class="en fine">The WISE detections that belong to the target are selected with the proper motion only; the parallax plays no part in the selection. So the parallax that comes out of the fit cannot have been put in by the selection.</p>
+        <p class="src"><span class="en">In the code:</span> <code>geom.py</code> · <code>parallax_factors</code>, <code>propagate</code>; <code>motion.py</code> · <code>fit5</code>; <code>engine.js</code> · <code>parallaxFactors</code></p>
+      </div>
+      <figure class="fig">
+        <canvas class="tall" data-scene="motion"
+          data-en="The measured positions of WISE 0855, after the straight motion is removed, against the year: points that swing once a year and the model curve through them. Below, the curve of the misfit against the parallax."></canvas>
+        <div class="knob">
+          <label><span class="en">parallax</span><span class="sy">ϖ</span>
+            <input type="range" data-k="plx" min="0" max="1" step="0.002" value="0.502" data-d="3" data-u="″"></label>
+          <output></output>
+        </div>
+        <figcaption class="note">
+          <span class="en">Real measurements: WISE 0855, 23 WISE epochs (red) and 3 SPHEREx epochs (blue). The vertical axis is the wobble left in the east–west direction after the straight motion is removed. The slider changes the parallax; the other four unknowns are fitted again each time. The curve at the bottom shows the misfit (χ²): the best parallax is where it is lowest.</span>
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="step" id="m-09">
+      <span class="no">09</span>
+      <div class="say">
+        <h2><span class="en">From parallax to distance and speed</span></h2>
+        <p class="en">The smaller the wobble, the farther away the object is. Once we know the distance, we can also turn the motion on the sky into a real speed.</p>
+        <div class="eqn">
+          <math display="block"><mi>d</mi><mo>=</mo><mfrac><mn>1</mn><mi>ϖ</mi></mfrac><mspace width="2.4em"/><msub><mi>v</mi><mi>t</mi></msub><mo>=</mo><mn>4.74</mn><mspace width="0.2em"/><mi>μ</mi><mspace width="0.2em"/><mi>d</mi></math>
+        </div>
+        <table class="sheet sym"><tbody>
+          <tr><td><math><mi>ϖ</mi></math></td><td><span class="en">Parallax, in arcseconds (step 8).</span></td></tr>
+          <tr><td><math><mi>d</mi></math></td><td><span class="en">Distance, in parsecs (pc). An object with a parallax of exactly 1″ is 1 pc away.</span></td></tr>
+          <tr><td><math><mi>μ</mi></math></td><td><span class="en">Total proper motion, in arcseconds per year.</span></td></tr>
+          <tr><td><math><msub><mi>v</mi><mi>t</mi></msub></math></td><td><span class="en">Tangential speed: the speed across the line of sight, in km/s.</span></td></tr>
+          <tr><td><math><mn>4.74</mn></math></td><td><span class="en">The speed, in km/s, of an object that covers 1 astronomical unit in a year.</span></td></tr>
+        </tbody></table>
+        <dl class="read">
+          <div><dt><span class="en">WISE 0855, measured parallax</span></dt><dd>0.502 ± 0.038″ → ≈ 2.0 pc</dd></div>
+          <div><dt><span class="en">published</span></dt><dd>0.439″ → 2.28 pc</dd></div>
+          <div><dt><span class="en">tangential speed, catalogue values</span></dt><dd>≈ 88 km/s</dd></div>
+        </dl>
+        <p class="en fine">The honest statement: 0.50 ± 0.04 (statistical) ± 0.09 (systematic)″; the parallax is 1.7σ above the published value. The systematic is the part of the difference between the two halves of the WISE epochs that noise does not explain. WISE sets almost all of this value: SPHEREx's three epochs change it by 0.002″. Distance is not computed from the shift: the shift is proper motion, and distance comes from parallax. The distance and speed shown in the tool use the catalogue parallax.</p>
+        <p class="src"><span class="en">In the code:</span> <code>analysis.py</code> · <code>_shower</code> (1/ϖ), <code>vr.js</code> · <code>updateMeas</code> (4.74 μ / ϖ)</p>
+      </div>
+      <figure class="fig">
+        <canvas data-scene="distance"
+          data-en="The Sun and Earth’s orbit on the left, the object on the right. The angle between the lines from the two ends of the orbit to the object shows the parallax; as the parallax gets smaller the object moves away."></canvas>
+        <div class="knob">
+          <label><span class="en">parallax</span><span class="sy">ϖ</span>
+            <input type="range" data-k="plx" min="0.2" max="1" step="0.001" value="0.502" data-d="3" data-u="″"></label>
+          <output></output>
+        </div>
+        <figcaption class="note">
+          <span class="en">Schematic; the angles are made much larger so that they can be seen. Six months apart, Earth looks from the two ends of its orbit, and the direction to the object changes by 2ϖ. The speed is computed with the catalogue proper motion of 8.15″ per year. Move the slider to 0.439″ and you get the published distance (2.28 pc) and 88 km/s.</span>
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="step" id="m-10">
+      <span class="no">10</span>
+      <div class="say">
+        <h2><span class="en">Is it real? Controls</span></h2>
+        <p class="en">In a crowded field, even a spot that looks empty holds light from stars that cannot be told apart. If a candidate’s signal is real, the same measurement at hundreds of empty positions should rarely look the same. First we remove the common colour of the stars. Then we join two bands into one number. Last, we count: how many empty positions came out this high?</p>
+        <div class="eqn">
+          <math display="block"><mi>E</mi><mo>=</mo><mi>F</mi><mo>−</mo><mi>c</mi><mspace width="0.17em"/><msub><mi>F</mi><mi>ref</mi></msub><mspace width="2em"/><mi>c</mi><mo>=</mo><munder><mi>med</mi><mrow><mi>i</mi><mo>&lt;</mo><mi>j</mi></mrow></munder><mspace width="0.2em"/><mfrac><mrow><msub><mi>F</mi><mi>i</mi></msub><mo>−</mo><msub><mi>F</mi><mi>j</mi></msub></mrow><mrow><msub><mi>F</mi><mrow><mi>ref</mi><mo separator="true">,</mo><mi>i</mi></mrow></msub><mo>−</mo><msub><mi>F</mi><mrow><mi>ref</mi><mo separator="true">,</mo><mi>j</mi></mrow></msub></mrow></mfrac></math>
+          <math display="block"><mi>S</mi><mo>=</mo><mfrac><mrow><munder><mo>∑</mo><mi>b</mi></munder><mspace width="0.17em"/><msub><mi>T</mi><mi>b</mi></msub><mspace width="0.17em"/><msub><mi>E</mi><mi>b</mi></msub><mo>/</mo><msubsup><mi>σ</mi><mi>b</mi><mn>2</mn></msubsup></mrow><msqrt><munder><mo>∑</mo><mi>b</mi></munder><mspace width="0.17em"/><msubsup><mi>T</mi><mi>b</mi><mn>2</mn></msubsup><mo>/</mo><msubsup><mi>σ</mi><mi>b</mi><mn>2</mn></msubsup></msqrt></mfrac><mspace width="2.4em"/><mi>p</mi><mo>=</mo><mfrac><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow><mrow><mi>N</mi><mo>+</mo><mn>1</mn></mrow></mfrac></math>
+        </div>
+        <table class="sheet sym"><tbody>
+          <tr><td><math><mi>F</mi></math></td><td><span class="en">The flux in a long band: 3.8–4.4 or 4.4–5.0 µm.</span></td></tr>
+          <tr><td><math><msub><mi>F</mi><mi>ref</mi></msub></math></td><td><span class="en">The 2.4–3.8 µm flux. A cold dwarf is dark here; ordinary stars are not.</span></td></tr>
+          <tr><td><math><mi>c</mi></math></td><td><span class="en">The common colour of the empty positions: the median of the slopes of the lines through every pair of positions (the Theil–Sen slope). A few odd positions cannot spoil it.</span></td></tr>
+          <tr><td><math><mi>E</mi></math></td><td><span class="en">The colour excess: the light that stars cannot explain. The median of the controls is set to zero.</span></td></tr>
+          <tr><td><math><msub><mi>T</mi><mi>b</mi></msub><mo separator="true">,</mo><msub><mi>σ</mi><mi>b</mi></msub></math></td><td><span class="en">b counts the two long bands. T is the shape of a Y dwarf across them: 0.53 and 1. σ is the scatter of E at the empty positions (1.4826 · MAD).</span></td></tr>
+          <tr><td><math><mi>S</mi></math></td><td><span class="en">The matched filter: it adds the two bands into one number, with weights that suit the shape we look for.</span></td></tr>
+          <tr><td><math><mi>N</mi><mo separator="true">,</mo><mi>n</mi></math></td><td><span class="en">The number of empty control positions, and how many of them reach the target’s value of S.</span></td></tr>
+          <tr><td><math><mi>p</mi></math></td><td><span class="en">The chance probability. It comes from counting, not from a formula for the noise. The +1s count the target itself, so p is never zero.</span></td></tr>
+        </tbody></table>
+        <dl class="read">
+          <div><dt><span class="en">SMDET-1: scatter, 4.4–5.0 µm</span></dt><dd>333 → 75 µJy</dd></div>
+          <div><dt><span class="en">empty positions that reach the target</span></dt><dd>25 / 300</dd></div>
+          <div><dt><span class="en">chance probability</span></dt><dd>26 / 301 ≈ <span class="en">8.6%</span></dd></div>
+        </dl>
+        <p class="en fine"><span class="tag part">Not a detection</span>This is the result for SMDET-1: 25 of the 300 empty positions reach the same value. It is not a detection; it puts a number in place of the word “inconclusive” and shows that colour can push the crowding noise down. For WISE 0855, none of 150 empty positions reaches the target’s value.</p>
+        <p class="src"><span class="en">In the code:</span> <code>analysis.py</code> · <code>cold_candidate</code>, <code>colour_excess</code></p>
+      </div>
+      <figure class="fig">
+        <canvas class="tall" data-scene="excess"
+          data-en="The 300 empty positions in the SMDET-1 field, one point each: the 2.4–3.8 µm flux across, the colour excess up. As c grows the tilted cloud lies flat and the scatter band narrows; the target is the amber marker."></canvas>
+        <div class="knob">
+          <label><span class="en">colour</span><span class="sy">c</span>
+            <input type="range" data-k="c" min="0" max="1" step="0.01" value="0.52" data-d="2"></label>
+          <output></output>
+        </div>
+        <figcaption class="note">
+          <span class="en">Real measurements: the SMDET-1 field, 300 empty positions (points) and the target (amber). The horizontal axis is the 2.4–3.8 µm flux, the vertical axis the 4.4–5.0 µm colour excess. At c = 0 the cloud is tilted and the scatter is large; at c = 0.52 the cloud lies flat and the band narrows. The target still sits among the controls. The count here is for one band (24 / 300); the 26 in the text is for S, which joins the two bands.</span>
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="step" id="m-11">
+      <span class="no">11</span>
+      <div class="say">
+        <h2><span class="en">A light curve from a survey that never repeats a wavelength</span></h2>
+        <p class="en">SPHEREx sees a star at a different wavelength in every exposure. Did the brightness change, or is it just a different colour? To separate the two we assume this: the shape of the star’s spectrum stays the same, and only the whole of it gets brighter or fainter. Then, in the logarithm, two parts add up, and we solve for both together.</p>
+        <div class="eqn">
+          <math display="block"><mi>ln</mi><mspace width="0.17em"/><mi>F</mi><mo stretchy="false">(</mo><mi>λ</mi><mo separator="true">,</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi>s</mi><mo stretchy="false">(</mo><mi>λ</mi><mo stretchy="false">)</mo><mo>+</mo><mi>a</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mspace width="2em"/><munder><mo>∑</mo><mi>k</mi></munder><mspace width="0.17em"/><mi>a</mi><mo stretchy="false">(</mo><msub><mi>t</mi><mi>k</mi></msub><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn></math>
+          <math display="block"><mi mathvariant="normal">Δ</mi><mi>m</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mn>2.5</mn><mrow><mi>ln</mi><mspace width="0.17em"/><mn>10</mn></mrow></mfrac><mspace width="0.2em"/><mi>a</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></math>
+          <span class="who"><span class="en">Period</span></span>
+          <math display="block"><mi mathvariant="normal">Δ</mi><mi>m</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>≈</mo><msub><mi>c</mi><mn>0</mn></msub><mo>+</mo><msub><mi>c</mi><mn>1</mn></msub><mspace width="0.2em"/><mi>sin</mi><mspace width="0.17em"/><mfrac><mrow><mn>2</mn><mi>π</mi><mi>t</mi></mrow><mi>P</mi></mfrac><mo>+</mo><msub><mi>c</mi><mn>2</mn></msub><mspace width="0.2em"/><mi>cos</mi><mspace width="0.17em"/><mfrac><mrow><mn>2</mn><mi>π</mi><mi>t</mi></mrow><mi>P</mi></mfrac></math>
+        </div>
+        <table class="sheet sym"><tbody>
+          <tr><td><math><mi>F</mi><mo stretchy="false">(</mo><mi>λ</mi><mo separator="true">,</mo><mi>t</mi><mo stretchy="false">)</mo></math></td><td><span class="en">The flux measured at time t and wavelength λ. Each exposure is one pair (λ, t).</span></td></tr>
+          <tr><td><math><mi>s</mi><mo stretchy="false">(</mo><mi>λ</mi><mo stretchy="false">)</mo></math></td><td><span class="en">The mean spectrum of the star (its logarithm).</span></td></tr>
+          <tr><td><math><mi>a</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></math></td><td><span class="en">The change in brightness that all wavelengths share: the light curve. One value for each 10-day bin.</span></td></tr>
+          <tr><td><math><mo>∑</mo><mi>a</mi><mo>=</mo><mn>0</mn></math></td><td><span class="en">The condition that keeps the two parts apart: the light curve has zero mean.</span></td></tr>
+          <tr><td><math><mi mathvariant="normal">Δ</mi><mi>m</mi></math></td><td><span class="en">The same change in magnitudes; plus means brighter.</span></td></tr>
+          <tr><td><math><mi>P</mi></math></td><td><span class="en">The period, in days. It is tried in steps of 0.5 day; the one with the smallest misfit (χ²) wins.</span></td></tr>
+          <tr><td><math><msub><mi>c</mi><mn>0</mn></msub><mo separator="true">,</mo><msub><mi>c</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>c</mi><mn>2</mn></msub></math></td><td><span class="en">Found by least squares for each P. The peak-to-peak amplitude is 2√(c₁² + c₂²).</span></td></tr>
+        </tbody></table>
+        <dl class="read">
+          <div><dt><span class="en">R Draconis, fitted period</span></dt><dd>267 <span class="en">days</span></dd></div>
+          <div><dt><span class="en">honest range</span></dt><dd>250–280 <span class="en">days</span></dd></div>
+          <div><dt><span class="en">published</span></dt><dd>245.6 <span class="en">days</span></dd></div>
+        </dl>
+        <p class="en fine">The formal result is 267 ± 5 days (45 bins, χ² 150.7 / 42), with 1.7 magnitudes from peak to peak. But the data span 520 days, only 1.95 cycles, and the formal error understates the real uncertainty; the right statement is “about 250–280 days”. The core is saturated in 99.6% of the exposures, so the flux was measured in the wings of the image.</p>
+        <p class="src"><span class="en">In the code:</span> <code>variable.py</code> · <code>decompose</code>, <code>period_fit</code></p>
+      </div>
+      <figure class="fig">
+        <canvas class="tall" data-scene="lightcurve"
+          data-en="The light curve of R Draconis: points with error bars and the sine through them. Below, the curve of the misfit against the period; its lowest point is at 267 days."></canvas>
+        <div class="knob">
+          <label><span class="en">period</span><span class="sy">P</span>
+            <input type="range" data-k="p" min="150" max="400" step="0.5" value="267" data-d="1" data-u-en=" d"></label>
+          <output></output>
+        </div>
+        <figcaption class="note">
+          <span class="en">Real measurements: the light curve of R Draconis, 45 bins with at least five exposures each. The slider changes the period; the amber curve is the sine that fits best with that period. The curve at the bottom shows the misfit (χ²). Hollow points are bins with fewer than five exposures; they are not used in the fit.</span>
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="step" id="m-12">
+      <span class="no">12</span>
+      <div class="say">
+        <h2><span class="en">Stereo depth</span></h2>
+        <p class="en">The left eye sees epoch A, the right eye sees epoch B. A star that stayed put falls on the same spot for both eyes and appears on the plate. An object that moved falls on slightly different spots, and the brain reads this as depth. The amber ring in the headset is placed at a chosen depth in the same way.</p>
+        <div class="eqn">
+          <math display="block"><mi>Z</mi><mo>=</mo><mi>D</mi><mspace width="0.2em"/><mfrac><mi>IPD</mi><mrow><mi>IPD</mi><mo>−</mo><mi>d</mi></mrow></mfrac><mspace width="2.4em"/><mi>d</mi><mo>=</mo><mi mathvariant="normal">Δ</mi><mspace width="0.2em"/><mfrac><mi>W</mi><mi>θ</mi></mfrac></math>
+          <math display="block"><mi>M</mi><mo>=</mo><mfrac><mrow><mn>2</mn><mspace width="0.2em"/><mi>arctan</mi><mrow><mo>(</mo><mfrac><mi>W</mi><mrow><mn>2</mn><mi>D</mi></mrow></mfrac><mo>)</mo></mrow></mrow><mi>θ</mi></mfrac></math>
+        </div>
+        <table class="sheet sym"><tbody>
+          <tr><td><math><mi>Z</mi></math></td><td><span class="en">The distance at which the object (or the ring) appears.</span></td></tr>
+          <tr><td><math><mi>D</mi></math></td><td><span class="en">The distance from the eyes to the plate: 2.0 m.</span></td></tr>
+          <tr><td><math><mi>IPD</mi></math></td><td><span class="en">The distance between the two pupils: 63 mm.</span></td></tr>
+          <tr><td><math><mi>d</mi></math></td><td><span class="en">How far apart the two eyes’ images are on the plate, in metres. If it is positive the object appears behind the plate; if negative, in front of it.</span></td></tr>
+          <tr><td><math><mi mathvariant="normal">Δ</mi></math></td><td><span class="en">The shift of the object between the two epochs, in arcseconds.</span></td></tr>
+          <tr><td><math><mi>W</mi><mo separator="true">,</mo><mi>θ</mi></math></td><td><span class="en">The width of the plate (1.6 m) and the field of sky it shows (5.0′, about 300″).</span></td></tr>
+          <tr><td><math><mi>M</mi></math></td><td><span class="en">The magnification: the angle the plate covers for the eye, divided by the real angle of the patch of sky it shows. About 520.</span></td></tr>
+        </tbody></table>
+        <p class="en fine"><span class="tag part">Limit</span>As d gets close to the eye separation, Z goes to infinity. If d is larger still, the sight lines never meet and the image doubles. The roughly 130″ shift of WISE 0855 between 2010 and 2026 is 43% of the plate; in the headset that is about 19° apart, and it cannot be fused. Stereo is for shifts of a few arcseconds. Whether stereo is better than blink has not been measured, and that the object separates in depth has not yet been confirmed in the headset.</p>
+        <p class="src"><span class="en">In the code:</span> <code>vr.js</code> · <code>updateMeas</code> (Z), <code>arcsecPerM</code> (d), <code>mag</code> (M)</p>
+      </div>
+      <figure class="fig">
+        <canvas data-scene="stereo"
+          data-en="Seen from above: two eyes and a plate. On the plate the red and the blue image of the object; the lines from the eyes to these images cross behind the plate or in front of it."></canvas>
+        <div class="knob">
+          <label><span class="en">shift</span><span class="sy">Δ</span>
+            <input type="range" data-k="shift" min="-12" max="16" step="0.1" value="3" data-d="1" data-u="″"></label>
+          <output></output>
+        </div>
+        <figcaption class="note">
+          <span class="en">Seen from above, schematic: the sideways scale is stretched. The red and blue dots are the two images of the object on the plate; the amber dot where the sight lines cross is where the object appears. Make the shift larger: the crossing moves away; on a 5′ plate the lines become parallel at about 12″ and no longer meet.</span>
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="step" id="m-13">
+      <span class="no">13</span>
+      <div class="say">
+        <h2><span class="en">The injection test: would you have seen it?</span></h2>
+        <p class="en">We add a synthetic source of known brightness and known shift to the real exposures, and see whether it is found. We choose its brightness as a multiple of the noise at that spot. The same list of trials goes to people and to a machine observer. In the end we have numbers like “9 of 10 trials”, and we give an interval that says how far they can be trusted.</p>
+        <div class="eqn">
+          <span class="who"><span class="en">Flux of the source</span></span>
+          <math display="block"><msub><mi>σ</mi><mi>F</mi></msub><mo>=</mo><mfrac><mn>1</mn><msqrt><munder><mo>∑</mo><mi>i</mi></munder><mspace width="0.17em"/><mn>1</mn><mo>/</mo><msubsup><mi>σ</mi><mrow><mi>F</mi><mo separator="true">,</mo><mi>i</mi></mrow><mn>2</mn></msubsup></msqrt></mfrac><mspace width="2em"/><msub><mi>F</mi><mi>inj</mi></msub><mo>=</mo><mfrac><mi>S</mi><mi>N</mi></mfrac><mo>·</mo><mi>max</mi><mrow><mo stretchy="false">(</mo><msubsup><mi>σ</mi><mi>F</mi><mi>A</mi></msubsup><mo separator="true">,</mo><mspace width="0.3em"/><msubsup><mi>σ</mi><mi>F</mi><mi>B</mi></msubsup><mo stretchy="false">)</mo></mrow></math>
+          <span class="who"><span class="en">Machine observer</span></span>
+          <math display="block"><mi>z</mi><mo>=</mo><mfrac><mrow><mo stretchy="false">|</mo><mrow><msub><mrow><mo stretchy="false">⟨</mo><mi>B</mi><mo>−</mo><mi>A</mi><mo stretchy="false">⟩</mo></mrow><mrow><mn>3</mn><mo>×</mo><mn>3</mn></mrow></msub><mo>−</mo><mi>med</mi></mrow><mo stretchy="false">|</mo></mrow><mrow><mn>1.4826</mn><mo>·</mo><mi>MAD</mi></mrow></mfrac><mspace width="2em"/><mi>z</mi><mo>&gt;</mo><mn>5</mn></math>
+          <span class="who"><span class="en">Wilson interval</span></span>
+          <math display="block"><mover accent="true"><mi>p</mi><mo stretchy="false">^</mo></mover><mo>=</mo><mfrac><mi>k</mi><mi>n</mi></mfrac><mspace width="2em"/><mfrac><mrow><mover accent="true"><mi>p</mi><mo stretchy="false">^</mo></mover><mo>+</mo><mfrac><mn>1</mn><mrow><mn>2</mn><mi>n</mi></mrow></mfrac><mo>±</mo><msqrt><mfrac><mrow><mover accent="true"><mi>p</mi><mo stretchy="false">^</mo></mover><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mover accent="true"><mi>p</mi><mo stretchy="false">^</mo></mover><mo stretchy="false">)</mo></mrow><mi>n</mi></mfrac><mo>+</mo><mfrac><mn>1</mn><mrow><mn>4</mn><msup><mi>n</mi><mn>2</mn></msup></mrow></mfrac></msqrt></mrow><mrow><mn>1</mn><mo>+</mo><mfrac><mn>1</mn><mi>n</mi></mfrac></mrow></mfrac></math>
+        </div>
+        <table class="sheet sym"><tbody>
+          <tr><td><math><msub><mi>σ</mi><mrow><mi>F</mi><mo separator="true">,</mo><mi>i</mi></mrow></msub></math></td><td><span class="en">The formal flux error at the source position in exposure i (step 5).</span></td></tr>
+          <tr><td><math><msub><mi>σ</mi><mi>F</mi></msub></math></td><td><span class="en">All the exposures of one epoch together: the flux error of that epoch. A and B are the two epochs; the larger of the two is used.</span></td></tr>
+          <tr><td><math><mi>S</mi><mo>/</mo><mi>N</mi></math></td><td><span class="en">The chosen formal signal-to-noise ratio: 6, 10 or 16.</span></td></tr>
+          <tr><td><math><msub><mrow><mo stretchy="false">⟨</mo><mi>B</mi><mo>−</mo><mi>A</mi><mo stretchy="false">⟩</mo></mrow><mrow><mn>3</mn><mo>×</mo><mn>3</mn></mrow></msub></math></td><td><span class="en">The 3 × 3 pixel mean of the difference plate. med and MAD are the median and the median deviation of this mean over the whole plate.</span></td></tr>
+          <tr><td><math><mi>z</mi></math></td><td><span class="en">How many sigmas is the difference? The source counts as “found” if z is above 5 within 12″ of it, and below 5 there on the plate without the injection.</span></td></tr>
+          <tr><td><math><mi>k</mi><mo separator="true">,</mo><mi>n</mi></math></td><td><span class="en">The number of hits and the number of trials.</span></td></tr>
+          <tr><td><math><mo>±</mo></math></td><td><span class="en">The two ends of the Wilson interval: the range that most likely (1σ, about 68%) holds the true rate. It still makes sense for extreme results such as 0 / 10 or 10 / 10.</span></td></tr>
+        </tbody></table>
+        <dl class="read">
+          <div><dt><span class="en">closed loop: injected, recovered</span></dt><dd>275.85 → 275.85 µJy</dd></div>
+          <div><dt><span class="en">exposures recovered</span></dt><dd>40 / 40</dd></div>
+        </dl>
+        <p class="en fine"><span class="tag part">Not yet run</span>The human experiment has not been run yet. The numbers here belong to the machine observer alone; they do not hold for human observers and say nothing about stereo versus blink.</p>
+        <p class="src"><span class="en">In the code:</span> <code>inject.py</code> · <code>flux_sigma</code>, <code>build_trial</code>, <code>zmap</code>; <code>experiment.js</code> · <code>wilson</code></p>
+      </div>
+      <figure class="fig">
+        <canvas class="tall" data-scene="wilson"
+          data-en="Ten rows: your chosen result at the top, and under it the nine cells of the machine observer. In each row the rate found is a dot and the Wilson interval a thick line."></canvas>
+        <div class="knob">
+          <label><span class="en">hits</span><span class="sy">k</span>
+            <input type="range" data-k="k" min="0" max="10" step="1" value="9" data-d="0" data-u=" / 10"></label>
+          <output></output>
+        </div>
+        <figcaption class="note">
+          <span class="en">Real results of the machine observer: WISE 0855 field, 4.0–5.0 µm, 5σ threshold. Each row is one cell: the dot is the rate found, the thick line is the Wilson interval. The amber row at the top is yours: choose how many of 10 trials were hits and watch the interval change. In the nine-trial cells one position fell in a corner that no exposure covers.</span>
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="step" id="m-14">
+      <span class="no">14</span>
+      <div class="say">
+        <h2><span class="en">The cost of reading the archive</span></h2>
+        <p class="en">The tool does not download whole files; it asks only for the header and the pixel rows it needs. Before it downloads anything, it uses this formula to estimate how many bytes a field will cost, and shows the number in the interface.</p>
+        <div class="eqn">
+          <math display="block"><mi>B</mi><mo>≈</mo><mi>N</mi><mo>×</mo><mrow><mo stretchy="false">[</mo><mi>H</mi><mo>+</mo><mi>o</mi><mo>+</mo><mi>n</mi><mspace width="0.17em"/><mo stretchy="false">(</mo><mn>4</mn><mi>n</mi><mo>+</mo><mi>o</mi><mo stretchy="false">)</mo><mo stretchy="false">]</mo></mrow><mspace width="2em"/><mi>n</mi><mo>=</mo><mn>2</mn><mi>h</mi><mo>+</mo><mn>1</mn></math>
+        </div>
+        <table class="sheet sym"><tbody>
+          <tr><td><math><mi>B</mi><mo separator="true">,</mo><mi>N</mi></math></td><td><span class="en">The total number of bytes, and the number of exposures.</span></td></tr>
+          <tr><td><math><mi>H</mi></math></td><td><span class="en">The header read: 31 680 bytes (11 blocks of 2880 bytes).</span></td></tr>
+          <tr><td><math><mi>o</mi></math></td><td><span class="en">The overhead of each request: 750 bytes.</span></td></tr>
+          <tr><td><math><mi>n</mi><mo separator="true">,</mo><mi>h</mi></math></td><td><span class="en">One side of the window and its half-size, in pixels. For a 5′ window h = 24 and n = 49.</span></td></tr>
+          <tr><td><math><mn>4</mn><mi>n</mi><mo>+</mo><mi>o</mi></math></td><td><span class="en">The cost of one row. Each row is a separate request: n pixels of 4 bytes each, plus the overhead of the request.</span></td></tr>
+        </tbody></table>
+        <dl class="read">
+          <div><dt><span class="en">per exposure</span></dt><dd>≈ 80 kB</dd></div>
+          <div><dt><span class="en">358-exposure, 5′ field</span></dt><dd>≈ 29 MB</dd></div>
+          <div><dt><span class="en">same job, cutout service</span></dt><dd>≈ 1.4 GB</dd></div>
+        </dl>
+        <p class="en fine">The cutout service sends a 3.86 MB PSF table with every cutout: 3.95 MB per cutout. The estimate holds: for a 450-exposure field that had never been opened before (Luhman 16) the formula said 35.5 MB, and the measured total was 36.4 MB (catalogues included).</p>
+        <p class="src"><span class="en">In the code:</span> <code>cube.py</code> · <code>estimate_bytes</code>, <code>remote.py</code> · <code>_HEAD_BYTES</code>, <code>net.py</code> · <code>OVERHEAD</code></p>
+      </div>
+      <figure class="fig">
+        <canvas data-scene="cost"
+          data-en="At the top the bytes of a single exposure: header, pixels and the overhead of the requests. Below, two bars on the same scale: Ektos and the cutout service."></canvas>
+        <div class="knob">
+          <label><span class="en">number of exposures</span><span class="sy">N</span>
+            <input type="range" data-k="n" min="10" max="600" step="1" value="358" data-d="0"></label>
+          <output></output>
+        </div>
+        <figcaption class="note">
+          <span class="en">The bar at the top shows the bytes of a single exposure: the largest share is not the pixels but the header and the overhead of 50 separate requests. The two bars below are on the same scale. For 358 exposures the formula gives 28.2 MB; the number in the README is about 29 MB.</span>
+        </figcaption>
+      </figure>
+    </section>
+
+  </div>
+
+  <div class="end">
+  <p class="lead en">The story of the method behind these formulas is on the “How it works” page; all the numbers and their limits are in the repository’s README. None of them says that we discovered a new object.</p>
+  <p class="go">
+    <a class="primary" data-page="index.html" href="index.html"><span class="en">Open the tool</span></a>
+    <a data-page="how.html" href="how.html"><span class="en">How it works</span></a>
+    <a href="#contents"><span class="en">Back to top</span></a>
+  </p>
+  </div>
+</main>
+
+<script type="module">
+  import { initStaticPage } from './site.js';
+  const lang = initStaticPage('math.html');
+  for (const a of document.querySelectorAll('a[data-page]')) a.href = `${a.dataset.page}?lang=${lang}`;
+  import('./math.js').then(m => m.start(lang)).catch(err => console.warn('math: figures are not available:', err));
+</script>
+</body>
+</html>

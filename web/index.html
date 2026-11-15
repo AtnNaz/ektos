@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ektos comparison tool</title>
+<meta name="description" content="A blink and stereo comparison tool for the SPHEREx sky: see how a patch of sky changed over time.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 fill=%22%2305070D%22/%3E%3Ccircle cx=%2212%22 cy=%2216%22 r=%227%22 fill=%22%23FF6F5E%22/%3E%3Ccircle cx=%2220%22 cy=%2216%22 r=%227%22 fill=%22%235BB5FF%22 fill-opacity=%220.85%22/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header id="site"></header>
+
+<p id="notice" class="notice" hidden></p>
+
+<main class="table">
+  <section class="stage" data-ta="stageLabel">
+    <div class="modes" id="modes" role="tablist" data-ta="modesLabel">
+      <button type="button" role="tab" id="tab-blink" aria-controls="platePanel" data-mode="blink" data-t="modeBlink"></button>
+      <button type="button" role="tab" id="tab-diff" aria-controls="platePanel" data-mode="diff" data-t="modeDiff"></button>
+      <button type="button" role="tab" id="tab-stereo" aria-controls="platePanel" data-mode="stereo" data-t="modeStereo"></button>
+      <button type="button" role="tab" id="tab-sum" aria-controls="platePanel" data-mode="sum" data-t="modeSum"></button>
+    </div>
+    <div id="platePanel" role="tabpanel" aria-describedby="modeHelp">
+    <p id="modeHelp" class="mode-help"></p>
+    <div class="plate-wrap">
+      <canvas id="plate" width="900" height="900" tabindex="0" role="application" aria-describedby="caption"></canvas>
+    </div>
+    <p id="caption" class="caption"></p>
+    <div class="transport">
+      <div class="ctl" id="blinkCtl">
+        <span class="ctl-name" data-t="ctlPlay"></span>
+        <button id="play" type="button" data-t="pause"></button>
+        <label><span data-t="rate"></span>
+          <input id="rate" type="range" min="1" max="8" step="0.5" value="2.5">
+        </label>
+        <label><input id="movie" type="checkbox"> <span data-t="movie"></span></label>
+      </div>
+      <div class="ctl" id="stereoCtl" hidden>
+        <span class="ctl-name" data-t="ctlStereo"></span>
+        <button type="button" data-stereo="anaglyph" data-t="anaglyph"></button>
+        <button type="button" data-stereo="side" data-t="sideBySide"></button>
+        <label><span data-t="axis"></span>
+          <input id="axis" type="range" min="-180" max="180" step="1" value="0">
+          <output id="axisOut">0°</output>
+        </label>
+        <button id="enterVR" type="button" class="primary" data-t="enterVR"></button>
+        <button id="previewVR" type="button" data-t="previewVR"></button>
+      </div>
+      <div class="ctl view">
+        <span class="ctl-name" data-t="ctlView"></span>
+        <label data-tt="fovTip"><span data-t="fov"></span> <select id="fov"></select></label>
+        <label data-tt="negTip"><input id="neg" type="checkbox"> <span data-t="negative"></span></label>
+        <label data-tt="marksTip"><input id="marks" type="checkbox" checked> <span data-t="overlays"></span></label>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <aside class="side">
+    <details class="grp" id="expSec" hidden open>
+      <summary><span class="no">00</span><h2 data-t="expTitle"></h2><p class="why" data-t="expHint"></p></summary>
+      <div class="body">
+        <div id="expForm" class="exp-form">
+          <label><span data-t="expObs"></span> <input id="expObs" type="number" min="1" value="1"></label>
+          <label><span data-t="expReps"></span> <input id="expReps" type="number" min="1" max="10" value="1"></label>
+          <label><span data-t="expTime"></span> <input id="expTime" type="number" min="5" value="30"></label>
+          <button id="expStart" type="button" class="primary" data-t="expStart"></button>
+          <button id="expMachine" type="button" data-t="expMachine"></button>
+          <button id="expSave" type="button" data-t="expSave"></button>
+          <button id="expClear" type="button" data-t="expClear"></button>
+        </div>
+        <div id="expRun" class="exp-form" hidden>
+          <p id="expStatus" aria-live="polite"></p>
+          <button id="expNone" type="button" class="primary" data-t="expNone"></button>
+          <button id="expStop" type="button" data-t="expStop"></button>
+        </div>
+        <div id="expResult" class="measure"></div>
+        <div id="expMachineOut" class="measure"></div>
+      </div>
+    </details>
+
+    <details class="grp" open>
+      <summary><span class="no">01</span><h2 data-t="gField"></h2><p class="why" data-t="gFieldWhy"></p></summary>
+      <div class="body">
+        <form id="goto" class="goto" autocomplete="off">
+          <label for="coords" data-t="coordLabel"></label>
+          <div class="goto-row">
+            <input id="coords" type="text" spellcheck="false" placeholder="08h55m10.831s -07d14m42.53s">
+            <button type="submit" class="primary" data-t="open"></button>
+          </div>
+        </form>
+        <p class="note" data-t="fieldNote"></p>
+        <p class="subhead" data-t="readyFields"></p>
+        <nav id="targets" class="targets" data-ta="readyFields"></nav>
+        <p class="note" data-t="readyNote"></p>
+        <div id="yBox" hidden>
+          <p class="subhead" data-t="yGroup"></p>
+          <select id="ydwarfs" data-ta="yGroup"></select>
+          <p class="note" data-t="yNote"></p>
+          <p class="note" id="benchNote" hidden></p>
+        </div>
+      </div>
+    </details>
+
+    <details class="grp" open>
+      <summary><span class="no">02</span><h2 data-t="epochs"></h2><p class="why" data-t="epochsHint"></p></summary>
+      <div class="body">
+        <div id="epochs" class="epochs"></div>
+        <p class="note" data-t="epochsHow"></p>
+      </div>
+    </details>
+
+    <details class="grp" open>
+      <summary><span class="no">03</span><h2 data-t="window"></h2><p class="why" data-t="windowWhy"></p></summary>
+      <div class="body">
+        <canvas id="sampling" width="760" height="230"></canvas>
+        <p class="note" data-t="windowHint"></p>
+        <p class="subhead" data-t="bandsLabel"></p>
+        <div id="bands" class="bands"></div>
+        <p class="note" data-t="bandsHelp"></p>
+        <label class="option"><input id="cold" type="checkbox" aria-describedby="coldNote">
+          <span><span data-t="coldFilter"></span><small data-t="coldTip"></small></span>
+        </label>
+        <p class="note" id="coldNote" role="status" hidden></p>
+      </div>
+    </details>
+
+    <details class="grp" open id="measureSec">
+      <summary><span class="no">04</span><h2 data-t="measure"></h2><p class="why" data-t="measureWhy"></p></summary>
+      <div class="body">
+        <div id="measure" class="measure"></div>
+        <p class="subhead" data-t="limitHead"></p>
+        <button id="limitRun" type="button" data-t="limitRun"></button>
+        <div id="limitOut"></div>
+        <p class="note" data-t="limitHelp"></p>
+      </div>
+    </details>
+
+    <details class="grp" id="specSec">
+      <summary><span class="no">05</span><h2 data-t="spectrum"></h2><p class="why" data-t="spectrumWhy"></p></summary>
+      <div class="body">
+        <p class="hint" id="specHint" data-t="spectrumHint"></p>
+        <canvas id="spec" width="760" height="340"></canvas>
+        <p class="note" data-t="specHelp"></p>
+        <button id="listen" type="button" data-t="listen"></button>
+        <p class="note" data-t="listenHelp"></p>
+        <label class="follow"><input id="follow" type="checkbox"> <span data-t="follow"></span></label>
+      </div>
+    </details>
+
+    <details class="grp" open id="findingsSec" hidden>
+      <summary><span class="no">06</span><h2 data-t="findings"></h2><p class="why" data-t="findingsHint"></p></summary>
+      <div class="body">
+        <div id="findings"></div>
+      </div>
+    </details>
+
+    <details class="grp">
+      <summary><span class="no">07</span><h2 data-t="provenance"></h2><p class="why" data-t="provWhy"></p></summary>
+      <div class="body">
+        <div id="prov" class="prov"></div>
+      </div>
+    </details>
+  </aside>
+</main>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>

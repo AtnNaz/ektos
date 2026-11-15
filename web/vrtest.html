@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Ektos: headset test</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 fill=%22%2305070D%22/%3E%3Ccircle cx=%2212%22 cy=%2216%22 r=%227%22 fill=%22%23FF6F5E%22/%3E%3Ccircle cx=%2220%22 cy=%2216%22 r=%227%22 fill=%22%235BB5FF%22 fill-opacity=%220.85%22/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+<style>
+  #go { margin-top: 1.4rem; }
+</style>
+</head>
+<body>
+<main class="page">
+  <p class="kicker">Headset check</p>
+  <h1 class="display" style="max-width:24ch">Does the headset report a pose?</h1>
+  <p>A bare WebXR session without three.js. Put the headset on, press the button and wait 20 seconds. The left eye should look
+  reddish and the right eye bluish. If both are plain green, the headset reports no pose. The measurements are written below
+  and to the log of the local engine.</p>
+  <button id="go" type="button" class="primary">Start the check</button>
+  <pre id="out"></pre>
+</main>
+<script type="module">
+import { initStaticPage } from './site.js';
+initStaticPage('vrtest.html');
+const out = document.getElementById('out'), T0 = performance.now();
+function log(...m) {
+  const line = `[vrtest] ${((performance.now() - T0) / 1000).toFixed(2)}s ${m.join(' ')}`;
+  out.textContent += line + '\n';
+  try { fetch('api/log?m=' + encodeURIComponent(line), { keepalive: true }).catch(() => {}); } catch (e) {  }
+}
+const fmt = p => p ? `(${p.x.toFixed(2)},${p.y.toFixed(2)},${p.z.toFixed(2)})` : 'null';
+
+document.getElementById('go').onclick = async () => {
+  out.textContent = '';
+  const late = new URLSearchParams(location.search).get('gl') === 'late';
+  try {
+    log('start', navigator.userAgent.match(/Chrome\/[0-9.]+/) || '', '| gl', late ? 'late (makeXRCompatible)' : 'xrCompatible at creation');
+    const canvas = document.createElement('canvas');
+    const gl = canvas.getContext('webgl2', late ? {} : { xrCompatible: true });
+    log('context ok');
+    const session = await navigator.xr.requestSession('immersive-vr', { optionalFeatures: ['local-floor'] });
+    log('session granted | visibility', session.visibilityState, '| features', session.enabledFeatures ? [...session.enabledFeatures].join(',') : 'n/a',
+      '| layers API', session.renderState.layers !== undefined, '| frameRate', session.frameRate);
+    session.addEventListener('visibilitychange', () => log('visibility', session.visibilityState));
+    session.addEventListener('end', () => log('session ended'));
+    if (late) { await gl.makeXRCompatible(); log('makeXRCompatible done'); }
+    const layer = new XRWebGLLayer(session, gl);
+    await session.updateRenderState({ baseLayer: layer });
+    log('base layer', layer.framebufferWidth + 'x' + layer.framebufferHeight);
+    const spaces = {};
+    for (const type of ['viewer', 'local', 'local-floor']) {
+      try { spaces[type] = await session.requestReferenceSpace(type); } catch (e) { log('space', type, 'refused:', e.message); }
+    }
+    log('spaces', Object.keys(spaces).join(','));
+    const n = { frames: 0, viewer: 0, local: 0, 'local-floor': 0, input: 0, views: 0 };
+    let last = null, started = performance.now();
+    const onFrame = (time, frame) => {
+      n.frames++;
+      gl.bindFramebuffer(gl.FRAMEBUFFER, layer.framebuffer);
+      gl.disable(gl.SCISSOR_TEST);
+      gl.clearColor(0.05, 0.25, 0.10, 1); gl.clear(gl.COLOR_BUFFER_BIT);
+      let pose = null;
+      for (const type of Object.keys(spaces)) {
+        const p = frame.getViewerPose(spaces[type]);
+        if (p) { n[type]++; if (type === 'local') pose = p; else if (!pose) pose = p; }
+      }
+      if (pose) {
+        last = pose; n.views = pose.views.length;
+        gl.enable(gl.SCISSOR_TEST);
+        pose.views.forEach((view, i) => {
+          const vp = layer.getViewport(view);
+          gl.scissor(vp.x + vp.width / 4, vp.y + vp.height / 4, vp.width / 2, vp.height / 2);
+          if (i === 0) gl.clearColor(0.75, 0.2, 0.15, 1); else gl.clearColor(0.15, 0.3, 0.75, 1);
+          gl.clear(gl.COLOR_BUFFER_BIT);
+        });
+        gl.disable(gl.SCISSOR_TEST);
+      }
+      for (const src of session.inputSources) {
+        const sp = src.gripSpace || src.targetRaySpace, ref = spaces.local || spaces.viewer;
+        if (sp && ref && frame.getPose(sp, ref)) { n.input++; break; }
+      }
+      if (n.frames === 1 || n.frames % 90 === 0) {
+        log('frame', n.frames, '| poses viewer', n.viewer, 'local', n.local, 'floor', n['local-floor'], '| views', n.views,
+          '| controller poses', n.input, '| inputs', session.inputSources.length, '| visibility', session.visibilityState,
+          '| head', last ? fmt(last.transform.position) : 'null', last ? 'emulated ' + last.emulatedPosition : '');
+      }
+      if (performance.now() - started > 20000) { log('20 s: ending'); session.end(); return; }
+      session.requestAnimationFrame(onFrame);
+    };
+    session.requestAnimationFrame(onFrame);
+  } catch (err) {
+    log('FAILED:', err && (err.message || err));
+  }
+};
+</script>
+</body>
+</html>

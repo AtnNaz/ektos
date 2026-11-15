@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ektos: how it works</title>
+<meta name="description" content="How Ektos works: a blink and stereo comparator that shows the same patch of the SPHEREx sky on two dates, in thirteen short steps.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 fill=%22%2305070D%22/%3E%3Ccircle cx=%2212%22 cy=%2216%22 r=%227%22 fill=%22%23FF6F5E%22/%3E%3Ccircle cx=%2220%22 cy=%2216%22 r=%227%22 fill=%22%235BB5FF%22 fill-opacity=%220.85%22/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+<style>
+  .how { padding-top: 3.4rem; }
+  .how .display { max-width: 23ch; text-wrap: balance; }
+
+  .strip { display: block; width: 100%; height: clamp(8.5rem, 20vw, 13rem); margin-top: 2.8rem; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+  .how .key { display: flex; flex-wrap: wrap; gap: 0.4rem 2rem; margin-top: 0.9rem; max-width: none; color: var(--ink-faint); font-size: var(--step--2); letter-spacing: 0.14em; text-transform: uppercase; }
+  .key i { display: inline-block; width: 0.55rem; height: 0.55rem; margin-right: 0.6rem; }
+  .key .ka i { background: var(--epoch-a); }
+  .key .kb i { background: var(--epoch-b); }
+  .key .ks i { background: var(--signal); }
+  .key .len { margin-left: auto; }
+
+  .steps { position: relative; margin-top: 3.4rem; }
+  .steps::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 1px; background: var(--rule); }
+  .trace { position: absolute; left: 0; top: 0; width: 1px; height: 0; background: var(--signal); pointer-events: none; }
+
+  .step { display: grid; grid-template-columns: 4.4rem minmax(0, 5fr) minmax(0, 6fr); column-gap: 2.6rem; align-items: start; padding: 3.6rem 0 3.9rem; border-top: 1px solid var(--rule); }
+  .step .no { position: sticky; top: 1.4rem; padding: 0.5rem 0 0 1.25rem; color: var(--signal); font-size: var(--step--2); line-height: 1; letter-spacing: 0.22em; }
+  .step .no::before { content: ""; position: absolute; left: 0; top: calc(0.5rem + 0.45em); width: 0.75rem; height: 1px; background: var(--signal); }
+
+  .say h2 { margin: 0; max-width: 17ch; font-size: clamp(1.65rem, 2.7vw, 2.25rem); font-weight: 300; line-height: 1.12; letter-spacing: -0.012em; text-wrap: balance; }
+  .say p { margin-top: 1.1rem; max-width: 44ch; color: var(--ink-soft); font-size: var(--step-1); line-height: 1.55; }
+  .say p.eq { margin-top: 1.3rem; color: var(--ink); font-size: var(--step-2); font-weight: 300; letter-spacing: 0.01em; }
+  .say p.fine { max-width: 53ch; font-size: var(--step-0); }
+  .say .tag { margin-right: 0.5rem; vertical-align: 0.12em; }
+  .say .sheet { max-width: 34rem; margin-top: 1.5rem; }
+  .say .sheet td:first-child, .say .sheet td:nth-child(2) { white-space: nowrap; }
+
+  .read { display: flex; flex-wrap: wrap; gap: 0 2.4rem; max-width: 34rem; margin: 1.7rem 0 0; border-top: 1px solid var(--rule); }
+  .read div { padding-top: 0.8rem; }
+  .read dt { color: var(--ink-faint); font-size: var(--step--2); letter-spacing: 0.14em; text-transform: uppercase; }
+  .read dd { margin: 0.2rem 0 0; color: var(--ink); font-size: var(--step-2); font-weight: 300; line-height: 1.2; white-space: nowrap; }
+  .read dd sup { font-size: 0.6em; line-height: 0; }
+
+  .fig { margin: 0; min-width: 0; }
+  .fig canvas { display: block; width: 100%; height: auto; aspect-ratio: 16 / 10; background: var(--deep); border: 1px solid var(--rule); }
+  .fig figcaption { margin-top: 0.65rem; max-width: 62ch; font-size: var(--step--1); line-height: 1.5; }
+
+  .nots { list-style: none; max-width: 34rem; margin: 1.3rem 0 0; padding: 0; border-bottom: 1px solid var(--rule); }
+  .nots li { position: relative; padding: 0.65rem 0 0.65rem 1.7rem; border-top: 1px solid var(--rule); color: var(--ink-soft); font-size: var(--step-1); line-height: 1.45; }
+  .nots li::before { content: ""; position: absolute; left: 0; top: 1.4rem; width: 0.8rem; height: 1px; background: var(--ink-faint); }
+  .go { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 1.8rem; }
+  .go a { padding: 0.7rem 1.3rem; border: 1px solid var(--rule-strong); color: var(--ink); text-decoration: none; font-size: var(--step--1); letter-spacing: 0.12em; text-transform: uppercase; transition: border-color 0.12s, background 0.12s, color 0.12s; }
+  .go a:hover { border-color: var(--ink); }
+  .go a.primary { border-color: var(--signal); color: var(--signal); }
+  .go a.primary:hover { background: var(--signal); color: var(--void); }
+
+  @media (max-width: 62rem) {
+    .step { grid-template-columns: minmax(0, 1fr); row-gap: 1.5rem; padding: 2.7rem 0 3rem 1.6rem; }
+    .step .no { position: relative; top: 0; padding: 0; }
+    .step .no::before { left: -1.6rem; top: 0.45em; width: 1rem; }
+    .say h2 { max-width: 24ch; }
+    .fig { max-width: 44rem; }
+    .key .len { margin-left: 0; }
+  }
+</style>
+</head>
+<body>
+<header id="site"></header>
+
+<main class="page how">
+
+  <p class="kicker"><span class="en">How it works</span></p>
+  <h1 class="display">
+    <span class="en">The same patch of sky on two dates. Anything that moved stands out.</span>
+  </h1>
+  <p class="lead en">Ektos is a blink and stereo comparison tool for the SPHEREx infrared all-sky survey. You enter a coordinate, and it compares how that spot looked on different dates. The thirteen short steps below show how it works and where it stops.</p>
+
+  <canvas class="strip" data-scene="hero"
+    data-en="A small star field. One dot is drawn twice: red for epoch A, blue for epoch B, slightly apart."></canvas>
+  <p class="key">
+    <span class="ka"><i></i><span class="en">A · earlier epoch</span></span>
+    <span class="kb"><i></i><span class="en">B · later epoch</span></span>
+    <span class="ks"><i></i><span class="en">live or selected</span></span>
+    <span class="len"><span class="en">13 steps · about three minutes</span></span>
+  </p>
+
+  <div class="steps">
+    <span class="trace" aria-hidden="true"></span>
+
+    <section class="step" id="step-01">
+      <span class="no">01</span>
+      <div class="say">
+        <h2><span class="en">No two frames in the same colour</span></h2>
+        <p class="en">SPHEREx photographs the whole sky every six months, in 102 colours. Its linear variable filter changes colour from one end to the other. So each exposure (a single shot) sees the same point at a different wavelength, or colour. There are never “two frames in the same colour” to compare.</p>
+        <dl class="read">
+          <div><dt><span class="en">colour channels</span></dt><dd>102</dd></div>
+          <div><dt><span class="en">wavelength</span></dt><dd>0.75–5.0 µm</dd></div>
+          <div><dt><span class="en">pixel</span></dt><dd>6.15″</dd></div>
+        </dl>
+      </div>
+      <figure class="fig">
+        <canvas data-scene="lvf"
+          data-en="A filter strip steps under a fixed star; in each exposure the star falls on a different wavelength."></canvas>
+        <figcaption class="note">
+          <span class="en">Schematic. The filter moves one step under the star between exposures. The star lands on a different wavelength each time. Tone shows the wavelength, because on this page we keep colour for the epochs.</span>
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="step" id="step-02">
+      <span class="no">02</span>
+      <div class="say">
+        <h2><span class="en">Reading only the bytes we need</span></h2>
+        <p class="en">Each file in the archive is 66 MB. The official cutout service sends 3.95 MB for one cutout, because it adds a 3.86 MB PSF table. From the public S3 bucket, Ektos reads only the header and the pixel rows it needs. It asks for them by HTTP byte range: about 80 kB per exposure.</p>
+        <dl class="read">
+          <div><dt><span class="en">per exposure</span></dt><dd>≈ 80 kB</dd></div>
+          <div><dt><span class="en">358-exposure field, Ektos</span></dt><dd>≈ 29 MB</dd></div>
+          <div><dt><span class="en">same job, cutout service</span></dt><dd>≈ 1.4 GB</dd></div>
+        </dl>
+      </div>
+      <figure class="fig">
+        <canvas data-scene="bytes"
+          data-en="On a long file bar only a few thin slices light up. Below, two counters: Ektos about 29 MB, the cutout service about 1.4 GB."></canvas>
+        <figcaption class="note">
+          <span class="en">The file bar is schematic. The counters compare the two totals for a 358-exposure, 5′ field.</span>
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="step" id="step-03">
+      <span class="no">03</span>
+      <div class="say">
+        <h2><span class="en">Making frames we can compare</span></h2>
+        <p class="en">You choose a wavelength window. The tool takes every exposure of one visit that falls inside it. It subtracts the sky background, puts them on one common grid with north up, and averages them. Exposures with less noise count more (inverse-variance weights). The result is one frame per visit, all seen through the same window.</p>
+      </div>
+      <figure class="fig">
+        <canvas data-scene="stack"
+          data-en="Small noisy tiles settle one by one onto a common grid; as the stack grows the noise drops."></canvas>
+        <figcaption class="note">
+          <span class="en">Schematic. As noisy exposures stack on one grid the noise drops, and a faint source appears.</span>
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="step" id="step-04">
+      <span class="no">04</span>
+      <div class="say">
+        <h2><span class="en">Blink: two epochs in turn</span></h2>
+        <p class="en">The tool shows two epochs (two dates) one after the other. Stars that stayed put do not move; an object that changed place jumps. The frames here are real: Luhman 16, a pair of brown dwarfs 2 pc away. In this window we measured a shift of 2.5″ in one year; the catalogue model says 2.7″.</p>
+        <dl class="read">
+          <div><dt><span class="en">motion in one year</span></dt><dd>2.5″ <span class="en">measured</span> · 2.7″ model</dd></div>
+          <div><dt><span class="en">times the scatter of the control stars</span></dt><dd>≈ 12×</dd></div>
+        </dl>
+      </div>
+      <figure class="fig">
+        <canvas data-scene="blink"
+          data-en="Two real SPHEREx frames of the Luhman 16 field are shown in turn. The stars stay still; the object in the amber bracket jumps."></canvas>
+        <figcaption class="note">
+          <span class="en">Real SPHEREx data: the Luhman 16 field, 1.61–2.44 µm, first and last visit (2025.47 and 2026.46). This page stacked the frames in your browser. The zoom view on the right enlarges the amber square on the plate. The amber corners mark the object’s catalogue position.</span>
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="step" id="step-05">
+      <span class="no">05</span>
+      <div class="say">
+        <h2><span class="en">Difference: B minus A</span></h2>
+        <p class="en">We subtract the first frame from the second. Light that is only in A shows red; light that is only in B shows blue. An object that moved becomes a red–blue pair.</p>
+      </div>
+      <figure class="fig">
+        <canvas data-scene="diff"
+          data-en="The same two real frames: first A, then B, then B minus A. In the difference the object shows as a red–blue pair."></canvas>
+        <figcaption class="note">
+          <span class="en">The same real frames: first A, then B, then their difference. Even stars that stayed put do not vanish completely; faint red–blue traces remain around them.</span>
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="step" id="step-06">
+      <span class="no">06</span>
+      <div class="say">
+        <h2><span class="en">Stereo: an idea from 1901</span></h2>
+        <p class="en">The left eye sees A, the right eye sees B. Stars that stayed put merge into one flat plate. An object that moved floats in front of the plate or behind it. This is the stereo comparator that Carl Pulfrich built at Zeiss in 1901; Max Wolf found asteroids with it. The blink comparator came in 1904, and Tombaugh found Pluto with blink in 1930.</p>
+        <p class="en fine"><span class="tag part">Limit</span>This only works for shifts of a few arcseconds. WISE 0855 moved about 130″ between 2010 and 2026. A shift that large does not merge; you see a double image. The tool opens the pair in a VR headset (HTC Vive Pro). We have not yet confirmed in the headset that the object separates in depth. We have not yet measured whether stereo beats blink either.</p>
+      </div>
+      <figure class="fig">
+        <canvas data-scene="stereo"
+          data-en="Seen from above: two eyes and a plate. The sight lines to a fixed star meet on the plate; those to the object that moved cross in front of it or behind it."></canvas>
+        <figcaption class="note">
+          <span class="en">Seen from above, schematic. The sight lines to a fixed star meet on the plate. The lines to the object that moved cross in front of it or behind it. If the shift is too large, the lines never meet.</span>
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="step" id="step-07">
+      <span class="no">07</span>
+      <div class="say">
+        <h2><span class="en">Removing ordinary stars by their colour</span></h2>
+        <p class="eq">R = W2s − k · W1s</p>
+        <p class="en">We call this the cold dwarf filter. W2s is the 4.0–5.0 µm image and W1s is the 3.0–3.8 µm image. k is the median brightness (flux) ratio of the field’s own stars. Ordinary stars cancel out. A cold object, bright only at 4–5 µm, stays.</p>
+        <dl class="read">
+          <div><dt><span class="en">with the filter: position against the blind prediction</span></dt><dd><span class="en">within 1σ</span></dd></div>
+          <div><dt><span class="en">without it, blended with a star</span></dt><dd><span class="en">off by up to 6σ</span></dd></div>
+        </dl>
+      </div>
+      <figure class="fig">
+        <canvas data-scene="cold"
+          data-en="Three schematic images: W2s minus k times W1s equals R. The stars cancel and a single point is left."></canvas>
+        <figcaption class="note">
+          <span class="en">Schematic. The measurement is for WISE 0855, which today sits 4–8″ from a fixed background star.</span>
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="step" id="step-08">
+      <span class="no">08</span>
+      <div class="say">
+        <h2><span class="en">Sixteen years with WISE</span></h2>
+        <p class="en">We put the WISE image from 2010 on the same grid, and it becomes one more epoch. Since then WISE 0855 has crossed 43% of the plate. The tool measures the shift itself: 129.5 ± 0.3″, or 8.23″ per year. The catalogue model says 128.6″ and 8.15″ per year.</p>
+        <dl class="read">
+          <div><dt><span class="en">2010 → 2026, measured</span></dt><dd>129.5 ± 0.3″</dd></div>
+          <div><dt><span class="en">measured speed</span></dt><dd>8.23″ / <span class="en">yr</span></dd></div>
+          <div><dt><span class="en">catalogue</span></dt><dd>8.15″ / <span class="en">yr</span></dd></div>
+        </dl>
+      </div>
+      <figure class="fig">
+        <canvas data-scene="wise"
+          data-en="A dot walks from the 2010 WISE position to the 2026 SPHEREx position while a year counter runs from 2010 to 2026."></canvas>
+        <figcaption class="note">
+          <span class="en">Schematic, but the direction is as measured: the object moves west and slightly north.</span>
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="step" id="step-09">
+      <span class="no">09</span>
+      <div class="say">
+        <h2><span class="en">Parallax: from a wobble to a distance</span></h2>
+        <p class="en">On top of its straight motion, the object wobbles once a year, because Earth goes around the Sun. This wobble is called parallax; its size gives the distance. For WISE 0855, WISE and SPHEREx together give 0.502 ± 0.038″. That is about 2.0 pc (the published value is 2.28 pc).</p>
+        <dl class="read">
+          <div><dt><span class="en">parallax</span></dt><dd>0.502 ± 0.038″</dd></div>
+          <div><dt><span class="en">distance</span></dt><dd>≈ 2.0 pc</dd></div>
+          <div><dt><span class="en">published</span></dt><dd>2.28 pc</dd></div>
+        </dl>
+        <p class="en fine">The honest version: 0.50 ± 0.04 (statistical) ± 0.09 (systematic)″; WISE sets almost all of it.</p>
+      </div>
+      <figure class="fig">
+        <canvas data-scene="parallax"
+          data-en="The path on the sky: a straight line with a yearly wobble on top. Earth’s orbit in the corner."></canvas>
+        <figcaption class="note">
+          <span class="en">Schematic; we enlarged the wobble so you can see it.</span>
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="step" id="step-10">
+      <span class="no">10</span>
+      <div class="say">
+        <h2><span class="en">A control for every claim</span></h2>
+        <p class="en">We repeat every measurement at empty positions or on control stars. If the target stands outside the controls, the result means something. If it sits among them, it does not.</p>
+        <table class="sheet">
+          <tbody>
+            <tr><td>WISE 0855</td><td><span class="en">150 empty positions</span></td><td><span class="en">None reaches the target’s value.</span></td></tr>
+            <tr><td>SMDET-1</td><td><span class="en">300 empty positions</span></td><td><span class="en">25 reach the same statistic: a chance probability of 8.6%. This is not a detection.</span></td></tr>
+            <tr><td>Luhman 16</td><td><span class="en">13–16 control stars</span></td><td><span class="en">Median shift 0.1″ or less; scatter 0.07–0.21″.</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <figure class="fig">
+        <canvas data-scene="controls"
+          data-en="Two strips. For WISE 0855 the target marker is far outside the control ticks; for SMDET-1 it sits among them."></canvas>
+        <figcaption class="note">
+          <span class="en">Real measurements. Ticks are empty control positions; the amber marker is the target. The axis shows the 4.4–5.0 µm colour excess, in units of the control scatter (σ). On this measure, 24 of the 300 SMDET-1 positions reach the target. The 26 in the table comes from the template statistic.</span>
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="step" id="step-11">
+      <span class="no">11</span>
+      <div class="say">
+        <h2><span class="en">Would you have seen it?</span></h2>
+        <p class="en">We add an artificial source with a known brightness (flux) and shift to the real exposures. The same list of trials goes to people (blink and stereo) and to a machine observer.</p>
+        <p class="en fine"><span class="tag part">Not yet run</span>We have not run the human experiment yet. The numbers here come only from the machine observer.</p>
+        <dl class="read">
+          <div><dt><span class="en">closed loop: added, measured back</span></dt><dd>275.85 → 275.85 µJy</dd></div>
+          <div><dt><span class="en">12″ shift, formal S/N ≥ 10</span></dt><dd>19 / 19</dd></div>
+          <div><dt><span class="en">3″ shift</span></dt><dd>1 / 30</dd></div>
+        </dl>
+      </div>
+      <figure class="fig">
+        <canvas data-scene="trials"
+          data-en="A trial grid with nine cells: shifts of 3, 6 and 12 arcseconds; formal S/N 6, 10 and 16. Each small square is one trial; the filled ones were found."></canvas>
+        <figcaption class="note">
+          <span class="en">Machine observer, WISE 0855 field, 4.0–5.0 µm, 5σ threshold. Each square is one trial: filled means found, empty means missed. In the nine-trial cells one position fell in a corner that no exposure covers. These numbers do not hold for human observers and say nothing about stereo versus blink.</span>
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="step" id="step-12">
+      <span class="no">12</span>
+      <div class="say">
+        <h2><span class="en">Two engines, one answer</span></h2>
+        <p class="en">Two separate engines do the maths: one in Python, one in the browser. They must get the same numbers from the same package. On six fields, 68 of 68 checks agree. <a data-page="parity.html" href="parity.html">Open the engine check</a>; that page runs the comparison again.</p>
+        <dl class="read">
+          <div><dt><span class="en">checks that agree</span></dt><dd>68 / 68</dd></div>
+          <div><dt><span class="en">largest relative difference, stacks and photometry</span></dt><dd>7 × 10<sup>−8</sup></dd></div>
+          <div><dt><span class="en">position fits (two separate optimisers)</span></dt><dd>2 × 10<sup>−5</sup></dd></div>
+        </dl>
+      </div>
+      <figure class="fig">
+        <canvas data-scene="parity"
+          data-en="Two rows: Python and the browser. Sixty-eight checks match one by one; the counter reaches 68 / 68."></canvas>
+        <figcaption class="note">
+          <span class="en">Schematic. One known difference remains: with the D1–D6 presets the two engines do not pick the same exposures. The check does not cover that.</span>
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="step" id="step-13">
+      <span class="no">13</span>
+      <div class="say">
+        <h2><span class="en">What we do not claim</span></h2>
+        <ul class="nots en">
+          <li>That we discovered a new object.</li>
+          <li>That we confirmed SMDET-1.</li>
+          <li>That SPHEREx can see Planet Nine.</li>
+          <li>That stereo is better than blink, before we run the experiment.</li>
+          <li>That SPHEREx alone measures parallax for faint objects.</li>
+          <li>That the machine observer’s numbers hold for human observers.</li>
+        </ul>
+      </div>
+      <div class="say">
+        <p class="en">The measurements on this page come from the repository’s README. It describes the full method and its limits. You can try the rest yourself in the tool.</p>
+        <p class="go">
+          <a class="primary" data-page="index.html" href="index.html"><span class="en">Open the tool</span></a>
+          <a data-page="data.html" href="data.html"><span class="en">Data</span></a>
+        </p>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<script type="module">
+  import { initStaticPage } from './site.js';
+  const lang = initStaticPage('how.html');
+  for (const a of document.querySelectorAll('a[data-page]')) a.href = `${a.dataset.page}?lang=${lang}`;
+  import('./how.js').then(m => m.start(lang)).catch(err => console.warn('how: animations are not available:', err));
+</script>
+</body>
+</html>

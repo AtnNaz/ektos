@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ektos: data</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 fill=%22%2305070D%22/%3E%3Ccircle cx=%2212%22 cy=%2216%22 r=%227%22 fill=%22%23FF6F5E%22/%3E%3Ccircle cx=%2220%22 cy=%2216%22 r=%227%22 fill=%22%235BB5FF%22 fill-opacity=%220.85%22/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+<style>
+  .flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin-top: 1.6rem; border-top: 1px solid var(--rule-strong); }
+  .flow div { padding: 0.9rem 1rem 1.1rem 0; border-right: 1px solid var(--rule); }
+  .flow div:last-child { border-right: 0; }
+  .flow div + div { padding-left: 1rem; }
+  .flow b { display: block; color: var(--signal); font-size: var(--step--2); font-weight: 400; letter-spacing: 0.16em; }
+  .flow strong { display: block; margin-top: 0.3rem; font-weight: 500; }
+  .flow span { display: block; margin-top: 0.25rem; color: var(--ink-soft); font-size: var(--step--1); }
+  @media (max-width: 52rem) { .flow { grid-template-columns: 1fr 1fr; } .flow div { border-right: 0; border-bottom: 1px solid var(--rule); padding-left: 0 !important; } }
+</style>
+</head>
+<body>
+<main class="page">
+  <p class="kicker"><span class="en">Data</span></p>
+  <h1 class="display"><span class="en">Which data, used where</span></h1>
+  <p class="lead">
+    <span class="en">Every pixel in the tool comes from the NASA archive. No image or data point is generated. This page shows which data set is used for what. It also lists the ones we downloaded but do not use yet.</span>
+  </p>
+
+  <div class="flow">
+    <div><b>01</b><strong><span class="en">List</span></strong>
+      <span class="en">We ask IRSA which exposures cover the position. The answer is a few hundred kB.</span></div>
+    <div><b>02</b><strong><span class="en">Read only what is needed</span></strong>
+      <span class="en">From each 66 MB file we read only the header and the pixel rows, by byte range: about 80 kB per exposure.</span></div>
+    <div><b>03</b><strong><span class="en">Package</span></strong>
+      <span class="en">We write the exposures to one package with their times, wavelengths and astrometry (position data).</span></div>
+    <div><b>04</b><strong><span class="en">Compute in the browser</span></strong>
+      <span class="en">Stacking, differences, spectra and measurements run on the page; no server is needed.</span></div>
+  </div>
+
+  <h2><span class="en">Data the tool uses</span></h2>
+  <table class="sheet">
+    <thead><tr>
+      <th><span class="en">Data set</span></th>
+      <th><span class="en">Where it is used</span></th>
+      <th><span class="en">How it is fetched</span></th>
+      <th>DOI</th>
+    </tr></thead>
+    <tbody>
+      <tr>
+        <td>SPHEREx Level 2 spectral images<br><span class="tag on">DR1 · QR3</span></td>
+        <td><span class="en">The source of everything: all frames, blink, difference, stereo, spectra, the cold dwarf filter, positions, light curves.</span></td>
+        <td><span class="en">Read by byte range from the public S3 bucket (<code>ektos/remote.py</code>); the list comes from IRSA SIA2.</span></td>
+        <td><a href="https://doi.org/10.26131/IRSA678">IRSA678</a><br><a href="https://doi.org/10.26131/IRSA662">IRSA662</a></td>
+      </tr>
+      <tr>
+        <td>AllWISE Atlas images (W1, W2)<br><span class="tag on">2010</span></td>
+        <td><span class="en">The “WISE 2010” epoch: an extra frame on the SPHEREx grid. It gives a 16-year time span.</span></td>
+        <td><span class="en">IRSA SIA cutout, two small files per field.</span></td>
+        <td><a href="https://doi.org/10.26131/IRSA153">IRSA153</a></td>
+      </tr>
+      <tr>
+        <td>WISE · NEOWISE single-exposure source tables<br><span class="tag on">2010–2024</span></td>
+        <td><span class="en">Proper motion (steady drift across the sky) and parallax (yearly wobble) of WISE 0855: its position at every WISE visit.</span></td>
+        <td>IRSA TAP</td>
+        <td>IRSA</td>
+      </tr>
+      <tr>
+        <td>Gaia DR3<br><span class="tag on">2016.0</span></td>
+        <td><span class="en">The reference frame for position measurements; the rings on the plate (stars are moved to the date on screen).</span></td>
+        <td>IRSA TAP, <code>gaia_dr3_source</code></td>
+        <td>ESA Gaia</td>
+      </tr>
+      <tr>
+        <td>SPHEREx DR1 All-Sky Cube (HiPS)<br><span class="tag part"><span class="en">visual only</span></span></td>
+        <td><span class="en">The sky behind the plate in VR and the background of this site. We do not measure from it: the HiPS has a fixed scale.</span></td>
+        <td><span class="en">An 8192-pixel all-sky image built from tiles we downloaded earlier; the site includes 4096 and 2048-pixel copies.</span></td>
+        <td><a href="https://doi.org/10.26131/IRSA679">IRSA679</a></td>
+      </tr>
+      <tr>
+        <td><span class="en">Published values</span></td>
+        <td><span class="en">For comparison only: catalogue positions, proper motions and parallaxes of the targets. Every number the tool reports is measured from the images.</span></td>
+        <td><span class="en">Entered by hand</span> (<code>ektos/targets.py</code>)</td>
+        <td>Luhman 2013 · Luhman &amp; Esplin 2016 · Kirkpatrick 2021 · Meisner 2026</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2><span class="en">Packaged fields</span></h2>
+  <p><span class="en">The packages that come with the site. Each one opens without a server.</span></p>
+  <table class="sheet" id="fields">
+    <thead><tr>
+      <th><span class="en">Field</span></th>
+      <th><span class="en">What</span></th>
+      <th class="num"><span class="en">Exposures</span></th>
+      <th class="num"><span class="en">Epochs</span></th>
+      <th class="num"><span class="en">Plate</span></th>
+      <th><span class="en">Extra measurements</span></th>
+    </tr></thead>
+    <tbody></tbody>
+  </table>
+
+  <h2><span class="en">The downloaded offline archive</span></h2>
+  <p>
+    <span class="en">We also downloaded everything on the challenge's resources page to disk (about 80 GB). <strong>The tool's results do not depend on this archive</strong>; the tool reads the same exposures from the NASA archive itself. Below is the current state of each folder.</span>
+  </p>
+  <table class="sheet">
+    <thead><tr>
+      <th><span class="en">Folder</span></th>
+      <th><span class="en">Contents</span></th>
+      <th class="num"><span class="en">Size</span></th>
+      <th><span class="en">Status</span></th>
+    </tr></thead>
+    <tbody>
+      <tr><td>01_nasa_spherex</td>
+        <td><span class="en">3,902 IRSA cutouts of the five test targets (Barnard 358, ε Indi B 458, WISE 0855 258, RW Aur 335, R Dra 2,493), IRSA tutorials, archive documentation.</span></td>
+        <td class="num">15 GB</td>
+        <td><span class="tag on"><span class="en">in use</span></span> <span class="en">The tool can read these cutouts with no network. We measured the photometry again with the real PSF from the WISE 0855 cutouts.</span></td></tr>
+      <tr><td>02_nasa_gaia</td>
+        <td><span class="en">Gaia DR3 catalogues around the test targets (0.15°).</span></td>
+        <td class="num">8 MB</td>
+        <td><span class="tag"><span class="en">backup</span></span> <span class="en">The tool queries the same catalogue itself.</span></td></tr>
+      <tr><td>03_csa_neossat</td>
+        <td><span class="en">NEOSSat tutorial, supporting documents, two sample days from 2024 (380 FITS).</span></td>
+        <td class="num">2.1 GB</td>
+        <td><span class="tag"><span class="en">not used</span></span> <span class="en">We looked at it: it is visible light, and no frame is closer than 39° to any of our fields. It is not part of any result.</span></td></tr>
+      <tr><td>04_wiseview</td>
+        <td><span class="en">CatWISE2020 and AllWISE catalogues, WiseView pages.</span></td>
+        <td class="num">27 MB</td>
+        <td><span class="tag"><span class="en">not used</span></span> <span class="en">The tool uses the single-exposure tables instead.</span></td></tr>
+      <tr><td>05_y_dwarfs</td>
+        <td><span class="en">16,135 SPHEREx cutouts: SMDET-1 and 10 cold dwarfs in the Galactic plane (six detectors), 34 Y dwarfs off the plane (D4–D6). Kirkpatrick 2024 tables (40 Y dwarfs within 20 pc), three papers.</span></td>
+        <td class="num">61–63 GB</td>
+        <td><span class="tag on"><span class="en">in use</span></span> <span class="en">The fields of 42 dwarfs were built from these cutouts. In the blind test the cold filter, not told where to look, raised an alarm at 37 of the 42 dwarfs. At empty positions the rate is 4%, and there are 4.8 false alarms per field on average.</span></td></tr>
+      <tr><td>06_sky_background</td>
+        <td><span class="en">100 channels of the SPHEREx DR1 all-sky HiPS cube, the AllWISE colour HiPS, and 8192-pixel sphere images made from them.</span></td>
+        <td class="num">817 MB</td>
+        <td><span class="tag on"><span class="en">in use</span></span> <span class="en">The VR background (4.57 µm), the site background (three colours), and the 100 channel maps you can step through in VR.</span></td></tr>
+      <tr><td>07_web_vendor</td>
+        <td>A-Frame 1.8, three.js r187</td>
+        <td class="num">74 MB</td>
+        <td><span class="tag"><span class="en">not used</span></span> <span class="en">The tool comes with its own three.js r160.</span></td></tr>
+    </tbody>
+  </table>
+
+  <h2><span class="en">Acknowledgement and licences</span></h2>
+  <p class="en">This work makes use of data products from the Spectro-Photometer for the History of the Universe, Epoch of Reionization and Ices Explorer (SPHEREx), a joint project of the Jet Propulsion Laboratory and the California Institute of Technology, funded by the National Aeronautics and Space Administration; of the Wide-field Infrared Survey Explorer (WISE/NEOWISE); and of the European Space Agency mission Gaia. All data were obtained through the NASA/IPAC Infrared Science Archive.</p>
+  <p><span class="en">Third party: three.js r160 (MIT), IBM Plex Sans (SIL Open Font License 1.1).</span></p>
+</main>
+
+<script type="module">
+import { initStaticPage } from './site.js';
+const lang = initStaticPage('data.html');
+const EXTRA = {
+  analysis: 'proper motion and parallax',
+  candidate: 'cold dwarf test',
+  variable: 'light curve',
+};
+try {
+  const index = await (await fetch('data/index.json', { cache: 'no-store' })).json();
+  const body = document.querySelector('#fields tbody');
+  for (const [slug, f] of Object.entries(index)) {
+    const tr = document.createElement('tr');
+    const extras = (f.extras || []).map(e => EXTRA[e] || e).join(', ') || '—';
+    tr.innerHTML = `<td><a href="index.html?t=${slug}&lang=${lang}">${f.name}</a></td><td>${f.kind || 'field fetched live'}</td>`
+      + `<td class="num">${f.n_exp}</td><td class="num">${f.n_visits}</td><td class="num">${f.fov ? f.fov.toFixed(1) + '′' : '—'}</td><td>${extras}</td>`;
+    body.append(tr);
+  }
+} catch (err) {
+  document.querySelector('#fields tbody').innerHTML = `<tr><td colspan="6">Could not read the package list.</td></tr>`;
+}
+</script>
+</body>
+</html>
