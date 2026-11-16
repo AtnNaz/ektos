@@ -2,17 +2,18 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { BASE } from '@/lib/config';
 import { LANG_COOKIE, type Locale, swapLocale } from '@/lib/i18n';
 import { FlagGB, FlagTR } from './icons';
 
 type Item = { href: string; label: string };
 
 function rememberLang(to: Locale) {
-  document.cookie = `${LANG_COOKIE}=${to}; path=/; max-age=31536000; samesite=lax`;
+  document.cookie = `${LANG_COOKIE}=${to}; path=${BASE || '/'}; max-age=31536000; samesite=lax`;
 }
 
 export function NavLinks({ items, label }: { items: Item[]; label: string }) {
-  const pathname = usePathname();
+  const pathname = usePathname().replace(/(.)\/$/, '$1');
   return (
     <nav aria-label={label}>
       <ul>

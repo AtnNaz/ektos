@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
+import { asset } from '@/lib/config';
 
 export function ToolEmbed({ src, probe, title, alt, offline }: { src: string; probe: string; title: string; alt: string; offline: string }) {
   const [up, setUp] = useState<boolean | null>(null);
@@ -21,7 +22,7 @@ export function ToolEmbed({ src, probe, title, alt, offline }: { src: string; pr
       <div className={`frame${up ? '' : ' shot'}`}>
         {up
           ? <iframe src={src} title={title} loading="lazy" />
-          : <Image src="/img/comparator-difference.png" alt={alt} width={1440} height={900} sizes="(max-width: 58rem) 100vw, 60vw" />}
+          : <Image src={asset('/img/comparator-difference.png')} alt={alt} width={1440} height={900} sizes="(max-width: 58rem) 100vw, 60vw" />}
       </div>
       {up === false && <figcaption>{offline}</figcaption>}
     </>

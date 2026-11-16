@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ContactForm } from '@/components/ContactForm';
+import { Arrow } from '@/components/icons';
 import { getDict } from '@/content';
+import { REPO_URL, STATIC } from '@/lib/config';
 import { hasLocale } from '@/lib/i18n';
 
 export async function generateMetadata({ params }: PageProps<'/[lang]/contact'>): Promise<Metadata> {
@@ -20,7 +22,14 @@ export default async function Contact({ params }: PageProps<'/[lang]/contact'>) 
         <h1>{c.title}</h1>
         <p className="lead">{c.lead}</p>
       </header>
-      <ContactForm d={c} lang={lang} />
+      {STATIC ? (
+        <div className="panel">
+          <p>{c.staticBody}</p>
+          <div className="links"><a className="btn primary" href={`${REPO_URL}/issues/new`} rel="noopener"><span>{c.staticCta.split('GitHub').flatMap((part, i) => (i ? [<span lang="en" key={i}>GitHub</span>, part] : [part]))}</span><Arrow /></a></div>
+        </div>
+      ) : (
+        <ContactForm d={c} lang={lang} />
+      )}
     </div>
   );
 }

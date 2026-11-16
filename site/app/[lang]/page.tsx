@@ -8,7 +8,7 @@ import { ToolEmbed } from '@/components/ToolEmbed';
 import { Arrow } from '@/components/icons';
 import { getDict } from '@/content';
 import fields from '@/content/fields.generated.json';
-import { TOOL_URL, toolLink } from '@/lib/config';
+import { STATIC, TOOL_URL, toolLink } from '@/lib/config';
 import { hasLocale } from '@/lib/i18n';
 
 const no = (i: number) => String(i).padStart(2, '0');
@@ -190,7 +190,7 @@ export default async function Home({ params }: PageProps<'/[lang]'>) {
       <section className="section wrap" aria-labelledby="demo-h">
         <p className="kicker"><span className="no">{no(9)}</span>{d.demo.kicker}</p>
         <h2 className="h2" id="demo-h">{d.demo.title}</h2>
-        <p className="lead">{d.demo.body}</p>
+        <p className="lead">{STATIC ? d.demo.staticBody : d.demo.body}</p>
         <div className="demo">
           <CoordinateDemo d={d.demo} toolBase={TOOL_URL} />
           <Counters d={d.stats} />

@@ -197,6 +197,10 @@ export const en = {
     done: 'Built',
     spent: 'spent',
     engineOffline: 'The engine is not running, so nothing can be fetched right now.',
+    staticBody: 'This copy of the site runs without a server, so it only checks the packaged fields. On your own computer the engine counts the exposures that cover any position, says what the download will cost, and only then fetches.',
+    lookup: 'Find the field',
+    looking: 'Checking the packaged fields…',
+    notPackaged: 'This position is not in a packaged field. To fetch it, run the engine on your own computer: python -m ektos.server',
     recordedTitle: 'A recorded run instead',
     recorded: `Luhman 16 AB, a position the tool had never seen: ${F.liveExposures} exposures counted, ${F.liveEstimate} estimated, ${F.liveMeasured} measured with catalogues.`,
     errors: {
@@ -218,6 +222,9 @@ export const en = {
     sessions: 'experiment sessions recorded',
     engineUp: 'Engine online',
     engineDown: 'Engine offline',
+    staticTitle: 'In the repository',
+    coldDwarfs: 'of them cold dwarf packages',
+    staticNote: 'This copy of the site runs without a server. The engine’s live counters appear only when the site runs next to the engine.',
   },
 
   next: {
@@ -320,6 +327,7 @@ export const en = {
     uploaded: 'sessions stored',
     duplicates: 'already on record, skipped',
     uploadErrors: { key: 'Wrong team key.', format: 'This file is not a set of Ektos experiment records.', disabled: 'Uploads are not configured on this server.', rate: 'Too many attempts. Wait a minute.', unknown: 'The upload failed.' },
+    staticUpload: 'Uploading records needs the site’s own server. This copy runs without one, so the upload is off here.',
   },
 
   contact: {
@@ -336,6 +344,8 @@ export const en = {
     sent: 'Thank you. Your message has been stored for the team.',
     errors: { message: 'Write a message of at least 10 characters.', long: 'The message is longer than 2000 characters.', email: 'That does not look like an email address.', rate: 'Too many messages. Wait a minute and try again.', unknown: 'The message could not be stored. Try again.' },
     left: 'characters left',
+    staticBody: 'This copy of the site runs without a server, so it cannot store messages. Open an issue on GitHub instead. Anyone can read it there.',
+    staticCta: 'Open an issue on GitHub',
   },
 
   admin: {

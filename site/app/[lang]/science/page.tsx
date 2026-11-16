@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import { Arrow } from '@/components/icons';
 import { getDict } from '@/content';
 import { MACHINE_TABLE } from '@/content/facts';
-import { toolLink } from '@/lib/config';
+import { asset, toolLink } from '@/lib/config';
 import { hasLocale } from '@/lib/i18n';
 
 export async function generateMetadata({ params }: PageProps<'/[lang]/science'>): Promise<Metadata> {
@@ -18,7 +18,7 @@ export default async function Science({ params }: PageProps<'/[lang]/science'>) 
   const d = getDict(lang), s = d.science, r = d.results;
   const fig = (file: string, f: { alt: string; caption: string }, w: number, h: number, wide = false) => (
     <figure className={wide ? (h > w ? 'tall' : 'wide') : undefined}>
-      <Image src={`/img/${file}`} alt={f.alt} width={w} height={h} sizes={wide ? '(max-width: 78rem) 100vw, 70rem' : '(max-width: 52rem) 100vw, 36rem'} />
+      <Image src={asset(`/img/${file}`)} alt={f.alt} width={w} height={h} sizes={wide ? '(max-width: 78rem) 100vw, 70rem' : '(max-width: 52rem) 100vw, 36rem'} />
       <figcaption>{f.caption}</figcaption>
     </figure>
   );

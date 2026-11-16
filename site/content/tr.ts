@@ -198,6 +198,10 @@ export const tr: Dict = {
     done: 'Kuruldu',
     spent: 'harcandı',
     engineOffline: 'Motor çalışmıyor; şu an hiçbir şey indirilemez.',
+    staticBody: 'Sitenin bu kopyası sunucusuz çalışır; bu yüzden yalnız hazır alanlara bakar. Kendi bilgisayarınızda motor, herhangi bir konumu kapsayan çekimleri sayar, indirmenin ne kadar tutacağını söyler ve ancak ondan sonra indirir.',
+    lookup: 'Alanı bul',
+    looking: 'Hazır alanlara bakılıyor…',
+    notPackaged: 'Bu konum hazır alanların içinde değil. İndirmek için motoru kendi bilgisayarınızda çalıştırın: python -m ektos.server',
     recordedTitle: 'Onun yerine kayıtlı bir koşu',
     recorded: `Luhman 16 AB, aracın hiç görmediği bir konum: ${F.liveExposures} çekim sayıldı, tahmin ${F.liveEstimate}, kataloglarla birlikte ölçülen ${F.liveMeasured}.`,
     errors: {
@@ -219,6 +223,9 @@ export const tr: Dict = {
     sessions: 'kayıtlı deney oturumu',
     engineUp: 'Motor çalışıyor',
     engineDown: 'Motor kapalı',
+    staticTitle: 'Depoda',
+    coldDwarfs: 'tanesi soğuk cüce paketi',
+    staticNote: 'Sitenin bu kopyası sunucusuz çalışır. Motorun canlı sayaçları yalnız site motorla birlikte çalışırken görünür.',
   },
 
   next: {
@@ -321,6 +328,7 @@ export const tr: Dict = {
     uploaded: 'oturum kaydedildi',
     duplicates: 'zaten kayıtlı, atlandı',
     uploadErrors: { key: 'Takım anahtarı yanlış.', format: 'Bu dosya Ektos deney kaydı değil.', disabled: 'Bu sunucuda yükleme ayarlanmamış.', rate: 'Çok fazla deneme. Bir dakika bekleyin.', unknown: 'Yükleme başarısız oldu.' },
+    staticUpload: 'Kayıt yüklemek sitenin kendi sunucusunu gerektirir. Bu kopya sunucusuz çalıştığı için yükleme burada kapalı.',
   },
 
   contact: {
@@ -337,6 +345,8 @@ export const tr: Dict = {
     sent: 'Teşekkürler. Mesajınız takım için kaydedildi.',
     errors: { message: 'En az 10 karakterlik bir mesaj yazın.', long: 'Mesaj 2000 karakterden uzun.', email: 'Bu bir e-posta adresine benzemiyor.', rate: 'Çok fazla mesaj. Bir dakika bekleyip yeniden deneyin.', unknown: 'Mesaj kaydedilemedi. Yeniden deneyin.' },
     left: 'karakter kaldı',
+    staticBody: 'Sitenin bu kopyası sunucusuz çalışır; bu yüzden mesaj saklayamaz. Onun yerine GitHub’da bir konu (issue) açın. Orada herkes okuyabilir.',
+    staticCta: 'GitHub’da konu aç',
   },
 
   admin: {

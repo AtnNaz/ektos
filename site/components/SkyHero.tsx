@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { asset } from '@/lib/config';
 
 type Field = { slug: string; name: string; center: number[] };
 
@@ -92,7 +93,7 @@ export function SkyHero({ fields }: { fields: Field[] }) {
       const start = () => { if (!raf && !reduce && visible && !document.hidden) { last = performance.now(); raf = requestAnimationFrame(loop); } };
 
       const tex = new THREE.TextureLoader().load(
-        '/sky/spherex_dr1_rgb_icrs_2048.jpg',
+        asset('/sky/spherex_dr1_rgb_icrs_2048.jpg'),
         t => {
           if (disposed) return;
           t.colorSpace = THREE.SRGBColorSpace;

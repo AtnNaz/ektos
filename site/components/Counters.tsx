@@ -2,11 +2,26 @@
 
 import { useEffect, useState } from 'react';
 import type { Dict } from '@/content';
+import fields from '@/content/fields.generated.json';
+import { STATIC } from '@/lib/config';
 
 type Stats = { engine: { up: boolean; mb: number | null; requests: number | null }; fields: number | null; sessions: number | null };
 const show = (v: number | null | undefined, digits = 0) => (typeof v === 'number' ? v.toLocaleString('en-US', { maximumFractionDigits: digits }) : '—');
 
-export function Counters({ d }: { d: Dict['stats'] }) {
+function StaticCounters({ d }: { d: Dict['stats'] }) {
+  return (
+    <div className="counters">
+      <h3>{d.staticTitle}</h3>
+      <dl className="read">
+        <div><dt>{d.fields}</dt><dd>{show(fields.total)}</dd></div>
+        <div><dt>{d.coldDwarfs}</dt><dd>{show(fields.coldDwarfs)}</dd></div>
+      </dl>
+      <p className="note">{d.staticNote}</p>
+    </div>
+  );
+}
+
+function LiveCounters({ d }: { d: Dict['stats'] }) {
   const [s, setS] = useState<Stats | null>(null);
   useEffect(() => {
     let on = true;
@@ -32,4 +47,8 @@ export function Counters({ d }: { d: Dict['stats'] }) {
       <p className="note">{d.note}</p>
     </div>
   );
+}
+
+export function Counters({ d }: { d: Dict['stats'] }) {
+  return STATIC ? <StaticCounters d={d} /> : <LiveCounters d={d} />;
 }

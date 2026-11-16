@@ -47,7 +47,7 @@ async function Area({ d }: { d: Dict['admin'] }) {
   );
 }
 
-export default async function Admin({ params }: PageProps<'/[lang]/admin'>) {
+export default async function Admin({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params;
   if (!hasLocale(lang)) notFound();
   const d = getDict(lang).admin;

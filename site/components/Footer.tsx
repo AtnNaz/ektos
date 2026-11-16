@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import type { Dict } from '@/content';
-import { toolLink } from '@/lib/config';
+import { asset, toolLink } from '@/lib/config';
 import type { Locale } from '@/lib/i18n';
 import { LangSwitch } from './HeaderNav';
 
@@ -20,7 +20,7 @@ export function Footer({ lang, d }: { lang: Locale; d: Dict }) {
             <h2>{f.docsTitle}</h2>
             <ul>
               {f.docs.map(doc => (
-                <li key={doc.file}><a href={`/docs/${doc.file}`}>{doc.label}</a><small>{f.docsLang}</small></li>
+                <li key={doc.file}><a href={asset(`/docs/${doc.file}`)}>{doc.label}</a><small>{f.docsLang}</small></li>
               ))}
             </ul>
           </section>

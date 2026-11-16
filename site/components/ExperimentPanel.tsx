@@ -2,11 +2,27 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import type { Dict } from '@/content';
+import { STATIC } from '@/lib/config';
 import type { ModeSummary, Summary } from '@/lib/experiment';
 
 const pct = (v: number) => `${Math.round(v * 100)}%`;
 
 export function ExperimentPanel({ d }: { d: Dict['experiment'] }) {
+  if (STATIC) {
+    return (
+      <>
+        <p className="empty">{d.none}</p>
+        <div className="panel">
+          <h3>{d.uploadTitle}</h3>
+          <p>{d.staticUpload}</p>
+        </div>
+      </>
+    );
+  }
+  return <LiveExperimentPanel d={d} />;
+}
+
+function LiveExperimentPanel({ d }: { d: Dict['experiment'] }) {
   const [sum, setSum] = useState<Summary | null>(null);
   const [failed, setFailed] = useState(false);
   const load = useCallback(() => {

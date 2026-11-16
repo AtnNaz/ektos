@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import type { Dict } from '@/content';
-import { parseCoords } from '@/lib/coords';
+import { STATIC } from '@/lib/config';
+import { type PackagedField, packagedField, parseCoords } from '@/lib/coords';
 import { Arrow } from './icons';
 
 type Count = { slug: string; kept: boolean; listed?: number; total?: number; cached?: number; est_mb?: number };
@@ -28,11 +29,23 @@ export function CoordinateDemo({ d, toolBase }: { d: Dict['demo']; toolBase: str
     setPhase({ k: 'error', msg: (status === 429 ? e.rate : code && e[code]) || e.unknown });
   };
 
+  async function lookup(pos: { ra: number; dec: number }) {
+    try {
+      const r = await fetch(`${toolBase}/data/index.json`);
+      if (!r.ok) throw new Error(String(r.status));
+      const index: Record<string, PackagedField> = await r.json();
+      if (!alive.current) return;
+      const slug = packagedField(index, pos.ra, pos.dec);
+      setPhase(slug ? { k: 'counted', pos, c: { slug, kept: true } } : { k: 'offline' });
+    } catch { if (alive.current) setPhase({ k: 'error', msg: d.errors.unknown }); }
+  }
+
   async function count(ev: React.FormEvent) {
     ev.preventDefault();
     const pos = parseCoords(text);
     if (!pos) return setPhase({ k: 'error', msg: d.badCoords });
     setPhase({ k: 'counting' });
+    if (STATIC) return lookup(pos);
     try {
       const r = await fetch(`/api/engine/count?ra=${pos.ra}&dec=${pos.dec}`);
       const body = await r.json();
@@ -64,6 +77,8 @@ export function CoordinateDemo({ d, toolBase }: { d: Dict['demo']; toolBase: str
   }
 
   const open = (slug: string) => `${toolBase}/index.html?t=${encodeURIComponent(slug)}`;
+  const openAt = (pos: { ra: number; dec: number }, slug: string) =>
+    STATIC ? `${toolBase}/index.html?ra=${pos.ra.toFixed(5)}&dec=${pos.dec.toFixed(5)}` : open(slug);
   const busy = phase.k === 'counting' || phase.k === 'building';
 
   return (
@@ -72,23 +87,23 @@ export function CoordinateDemo({ d, toolBase }: { d: Dict['demo']; toolBase: str
         <label htmlFor="coords">{d.label}</label>
         <div className="demo-form">
           <input id="coords" className="input" type="text" spellCheck={false} autoComplete="off" placeholder={d.placeholder} value={text} onChange={e => setText(e.target.value)} />
-          <button className="btn primary" type="submit" disabled={busy || !text.trim()}>{d.count}</button>
+          <button className="btn primary" type="submit" disabled={busy || !text.trim()}>{STATIC ? d.lookup : d.count}</button>
         </div>
       </form>
 
       <div className="demo-out" aria-live="polite">
-        {phase.k === 'counting' && <p className="msg">{d.counting}</p>}
+        {phase.k === 'counting' && <p className="msg">{STATIC ? d.looking : d.counting}</p>}
         {phase.k === 'error' && <p className="msg bad" role="alert">{phase.msg}</p>}
         {phase.k === 'offline' && (
           <>
-            <p className="msg bad">{d.engineOffline}</p>
+            <p className="msg bad">{STATIC ? d.notPackaged : d.engineOffline}</p>
             <div className="panel" style={{ marginTop: 0 }}><h3>{d.recordedTitle}</h3><p>{d.recorded}</p></div>
           </>
         )}
         {phase.k === 'counted' && (phase.c.kept ? (
           <>
             <p className="msg good">{d.curated}</p>
-            <div><a className="btn primary" href={open(phase.c.slug)}>{d.open}<Arrow /></a></div>
+            <div><a className="btn primary" href={openAt(phase.pos, phase.c.slug)}>{d.open}<Arrow /></a></div>
           </>
         ) : (
           <>

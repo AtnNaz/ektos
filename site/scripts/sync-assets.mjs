@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 const site = join(dirname(fileURLToPath(import.meta.url)), '..');
 const repo = join(site, '..');
+const base = process.env.EKTOS_PAGES === '1' ? (process.env.EKTOS_BASE_PATH || '').replace(/\/+$/, '') : '';
 
 const copies = [
   ['assets/interface-difference.png', 'img/comparator-difference.png'],
@@ -28,7 +29,7 @@ for (const [from, to] of copies) {
 const faces = readFileSync(join(repo, 'web/style.css'), 'utf8')
   .split('\n')
   .filter(line => line.startsWith('@font-face'))
-  .map(line => line.replaceAll('url("vendor/', 'url("/fonts/'));
+  .map(line => line.replaceAll('url("vendor/', `url("${base}/fonts/`));
 writeFileSync(join(site, 'app/fonts.generated.css'), `${faces.join('\n')}\n`);
 
 const index = JSON.parse(readFileSync(join(repo, 'web/data/index.json'), 'utf8'));
