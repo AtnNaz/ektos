@@ -1,8 +1,7 @@
-# Ektos
-
 # Live Demo
 https://atnnaz.github.io/ektos/
 
+# Ektos
 
 A blink and stereo comparator for the SPHEREx infrared sky.
 NASA Space Apps Challenge 2026, "Planet X and SPHEREx". Team Ektos.
